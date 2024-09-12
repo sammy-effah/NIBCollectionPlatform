@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{fragments/header :: head (~{::title})}">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+		<meta name="author" content="Coderthemes">
+		<meta name="_csrf" content="${_csrf.token}">
+		<meta name="_csrf_header" content="${_csrf.headerName}">
+		<!-- <link rel="shortcut icon" href="images/favicon_1.ico"> -->
+		<title>NIB Collection :: Admin Home</title>
+
+		<!-- Custom Files -->
+		<link th:href="@{/static/css/helper.css}" rel="stylesheet" type="text/css" />
+		<link th:href="@{/static/css/style.css}" rel="stylesheet" type="text/css" />
+		<link rel="stylesheet" th:href="@{https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css}">
+		<link rel="stylesheet" href="@{https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css}">
+		<link rel="stylesheet"
+			th:href="@{https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css}" />
+
+
+	</head>
+
+
+
+<body class="fixed-left">
+
+	<!-- Begin page -->
+	<div id="wrapper" style="padding-top: 1.1%;" class="container">
+
+		<div th:insert="~{fragments/header :: banner}"></div>
+
+		<!-- ========== Left Sidebar Start ========== -->
+		<!-- <div th:insert="~{fragments/sidebar :: sidebar(create_scheme_key)}"></div> -->
+		<!-- ========== Left Sidebar Start ========== -->
+
+		<!-- ============================================================== -->
+		<!-- Start right Content here -->
+		<!-- ============================================================== -->
+		<div class="content-page">
+			<!-- Start content -->
+			<div class="content">
+				<div class="container">
+
+					<!-- Page-Title -->
+					<div class="row">
+						<div class="col-md-2"></div>
+
+						<div class="col-md-5">
+
+
+							<div class="pull-left page-title">
+								<button data-bs-toggle="modal" data-bs-target="#add-user-modal"
+									class="btn btn-primary waves-effect waves-light">
+									Add User<i class="fa fa-plus"></i>
+								</button>
+							</div>
+
+						</div>
+						<!-- <span></span> -->
+						<div class="col-md-5">
+
+							<!-- <h4 class="pull-left page-title">Tasks</h4> -->
+							<div class="pull-left page-title">
+								<button data-bs-toggle="modal" data-bs-target="#add-donation-modal"
+									class="btn btn-primary waves-effect waves-light">
+									Add Donation Details<i class="fa fa-plus"></i>
+								</button>
+							</div>
+
+						</div>
+
+
+
+						<div id="add-user-modal" class="modal fade" tabindex="-1" role="dialog"
+							aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+							<div class="modal-dialog" style="width: 30%;">
+								<div class="modal-content">
+
+									<form id="add-user-form" action="#" method="" validate>
+
+										<div class="modal-header">
+											<button type="button" class="close" data-bs-dismiss="modal"
+												aria-hidden="true">×</button>
+											<h4 class="modal-title">Add User</h4>
+										</div>
+										<div class="modal-body">
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="firstName" class="control-label">
+															First Name</label>
+														<input type="text" class="form-control" name="firstName"
+															id="firstName">
+													</div>
+												</div>
+
+											</div>
+
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="lastName" class="control-label">Last Name
+														</label> <input type="tel" class="form-control" name="lastName"
+															id="lastName">
+													</div>
+												</div>
+											</div>
+
+
+											<div class="row">
+												<div class="col-md-6">
+													<div class="mb-3">
+														<label for="role" class="control-label">Role
+														</label> <select class="form-select" id="role" name="role">
+														</select>
+													</div>
+												</div>
+												<div class="col-md-6">
+													<div class="mb-3">
+														<label for="username" class="control-label">Username
+														</label> <input type="text" class="form-control" name="username"
+															id="username">
+													</div>
+												</div>
+											</div>
+
+											<div class="row">
+
+
+												<div class="col-md-6">
+
+													<div class="mb-3">
+
+														<label for="phoneNumber" class="control-label">Phone
+														</label> <input type="tel" class="form-control"
+															name="phoneNumber" id="phoneNumber">
+
+													</div>
+
+												</div>
+												<div class="col-md-6">
+
+													<div class="mb-3">
+
+														<label for="email" class="control-label">Email</label> <input
+															type="email" class="form-control" name="email" id="email">
+
+													</div>
+
+												</div>
+											</div>
+
+										</div>
+
+
+										<div class="modal-footer">
+											<button id="btnAdd" type="submit" onclick="addUser(this)"
+												class="btn btn-primary ">Add User</button>
+											<button type="button" class="btn btn-default waves-effect"
+												data-bs-dismiss="modal">Close</button>
+										</div>
+
+
+									</form>
+								</div>
+							</div>
+
+						</div>
+						<!-- Modal -->
+
+
+						<div id="add-donation-modal" class="modal fade" tabindex="-1" role="dialog"
+							aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+							<div class="modal-dialog" style="width: 30%;">
+								<div class="modal-content">
+
+									<form id="add-donation-form" action="#" method="" novalidate>
+
+										<div class="modal-header">
+											<button type="button" class="close" data-bs-dismiss="modal"
+												aria-hidden="true">×</button>
+											<h4 class="modal-title">Add Donation Details</h4>
+										</div>
+										<div class="modal-body">
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="nameD" class="control-label">
+															Name of Donatee</label>
+														<input type="text" class="form-control" name="nameD" id="nameD">
+													</div>
+												</div>
+
+											</div>
+
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="poster" class="control-label">Image of Donatee
+														</label> <input type="file" class="form-control" id="poster"
+															aria-describedby="basic-addon1" name="poster">
+
+													</div>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-6">
+													<div class="mb-3">
+														<label for="purpose" class="control-label">Purpose
+														</label> <select class="form-select" id="purpose"
+															name="purpose">
+															<option>Select Purpose</option>
+															<option value="Funeral">Funeral</option>
+															<option value="One Week Observation">One Week Observation</option>
+															<option value="Ordination">Ordination</option>
+															<option value="Others">Others</option>
+														</select>
+													</div>
+												</div>
+											</div>
+
+
+										</div>
+
+
+										<div class="modal-footer">
+											<button id="btnAdd" type="submit" class="btn btn-primary ">Add Donation
+												Details</button>
+											<button type="button" class="btn btn-default waves-effect"
+												data-bs-dismiss="modal">Close</button>
+										</div>
+
+
+									</form>
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+					<!-- /.modal -->
+
+					<div style="display: none" id="loading"></div>
+
+					<ol class="breadcrumb">
+
+						<li><a href="#">NIB Collection</a>|</li>
+						<li><a th:href="@{details}">Donation Details</a>|</li>
+						<li><a th:href="@{collection}">Collection</a>|</li>
+						<li class="active">Users</li>
+					</ol>
+				</div>
+			</div>
+
+			<div class="row" style="padding-left: 0.4%; padding-bottom: 0.7%;">
+				<!-- where to place the reporting records like total amount, users and things like that -->
+				<div class="col-sm-3">
+					<div class="card bg-primary-subtle">
+						<div class="card-header">
+							<h6 class="card-title" style="text-align: center;">Total no. of Users</h6>
+						</div>
+						<div class="card-body">
+							<span style="text-align: center;" id="totalUsers">0</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-3">
+					<div class="card bg-primary-subtle">
+						<div class="card-header">
+							<h6 class="card-title" style="text-align: center;">Total amount in GHS</h6>
+						</div>
+						<div class="card-body">
+							<span style="text-align: center;" id="GHS">0</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-3">
+					<div class="card bg-primary-subtle">
+						<div class="card-header">
+							<h6 class="card-title" style="text-align: center;">Total amount in USD</h6>
+						</div>
+						<div class="card-body">
+							<span style="text-align: center;" id="USD">0</span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-3">
+					<div class="card bg-primary-subtle">
+						<div class="card-header">
+							<h6 class="card-title" style="text-align: center;">Total Collection entries</h6>
+						</div>
+						<div class="card-body">
+							<span style="text-align: center;" id="totalCollections">0</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-md-12">
+
+					<div class="card card-default">
+						<div class="card-header">
+							<h3 class="card-title">User's Details</h3>
+						</div>
+						<div class="card-body">
+
+							<div class="row">
+								<div class="col-md-12">
+
+									<table id="datatable" style="width: 100%" class="display">
+										<thead>
+											<tr>
+												<th>Id</th>
+												<th>First Name</th>
+												<th>Last Name</th>
+												<th>Phone Number</th>
+												<th>Create Date</th>
+												<th>Email</th>
+												<th>Username</th>
+												<th>Enabled Status</th>
+												<th>Role</th>
+												<th>Action</th>
+
+											</tr>
+										</thead>
+
+
+										<tbody>
+											<tr>
+
+											</tr>
+										</tbody>
+									</table>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<!-- End Row -->
+
+
+		</div>
+		<!-- container -->
+		<!-- footer -->
+		<div th:insert="~{fragments/footer :: footer}"></div>
+	</div>
+	<!-- content -->
+
+	<script>
+		var resizefunc = [];
+	</script>
+	<script th:src="@{https://code.jquery.com/jquery-3.5.1.js}"></script>
+	<script th:src="@{https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js}"></script>
+	<script th:src="@{https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js}"></script>
+	<script th:src="@{https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js}"></script>
+	<script th:src="@{https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js}"></script>
+	<script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js}"
+		integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+		integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+		crossorigin="anonymous"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/node-waves/0.5.1/waves.min.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery.nicescroll/3.7.6/jquery.nicescroll.js}"
+		type="text/javascript"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/Detect.js/2.2.2/detect.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.8/jquery.slimscroll.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js}"></script>
+	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js}"></script>
+	<!-- <script th:src="@{https://cdn.jsdelivr.net/npm/modernizr@3.13.0/lib/cli.min.js}"></script> -->
+
+	<script>
+		getUserList();
+
+		function getUserList() {
+
+			// $("#loading").show();
+
+			$
+				.ajax({
+					'url': "[[@{/nib/api/get-users}]]",
+					'method': "GET",
+
+					'contentType': 'application/json'
+				})
+				.done(
+					function (data) {
+
+						$('#datatable')
+							.dataTable(
+								{
+									// "scrollY": 500,
+									"scrollX": true,
+									"processing": true,
+
+									"destroy": true,
+
+									pageLength: 10,
+
+									"aaData": data,
+
+									"dom": 'lBfrtip',
+
+									buttons: [
+										'copy', 'csv', 'excelHtml5', 'pdfHtml5', 'print'
+									],
+									order: [0, "desc"],
+
+									"columns": [
+
+										{
+											"data": "id"
+										},
+
+										{
+											"data": "firstName"
+										},
+
+										{
+											"data": "lastName"
+										},
+
+										{
+											"data": "phoneNumber"
+										},
+
+										{
+											data: "createDate",
+											render: function (data) {
+												return formatDate(data);
+											}
+										},
+
+										{
+											"data": "email"
+										},
+
+										{
+											"data": "username"
+										},
+
+										{
+											"data": "enabled"
+										},
+
+										{
+											"data": "roles.name"
+										},
+
+
+										{
+											"data": null
+										}
+
+									],
+
+									"columnDefs": [
+
+										{
+											"targets": -1,
+											// "data": "enabled",
+											"defaultContent": "",
+											"render": function (data, type, row) {
+												if (data.roles.name != "ADMIN") {
+													if (data.enabled === true) {
+														return "<button class='btn btn-warning btn-sm warning' style='background-color:#ffA500' onclick='triggerDisableDialogue(this)'>" +
+															"<span style='color:#ffffff'>Disable</span></button>" + "<button class='btn btn-default btn-sm save' style='background-color:#f44336' onclick='triggerDeleteDialogue(this)'>" +
+															"<span style='color:#ffffff'>Delete</span></button>";
+													} else {
+														return "<button class='btn btn-default btn-sm update' style='background-color:#5eba7d' onclick='triggerEnableDialogue(this)'>" +
+															"<span style='color:#ffffff'>Enable</span></button>" +
+															"<button class='btn btn-default btn-sm save' style='background-color:#f44336' onclick='triggerDeleteDialogue(this)'>" +
+															"<span style='color:#ffffff'>Delete</span></button>";
+													}
+												}
+											}
+										},
+
+										// {
+										// 	targets: [4],
+										// 	"render": function (
+										// 		data) {
+										// 		return moment(
+										// 			data)
+										// 			.format(
+										// 				"DD/MM/YYYY HH:mm:ss")
+										// 	},
+										// },
+
+									]
+
+								});
+
+
+
+					});
+
+		}
+
+		function formatDate(dateArray) {
+			// Create a date object from the array
+			var date = new Date(Date.UTC(dateArray[0], dateArray[1] - 1, dateArray[2], dateArray[3], dateArray[4], dateArray[5]));
+			var year = date.getFullYear();
+			var month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero
+			var day = String(date.getDate()).padStart(2, '0'); // Add leading zero
+			var hours = String(date.getHours()).padStart(2, '0'); // Add leading zero
+			var minutes = String(date.getMinutes()).padStart(2, '0'); // Add leading zero
+			var seconds = String(date.getSeconds()).padStart(2, '0'); // Add leading zero
+
+			// Return formatted date
+			return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+		}
+	</script>
+
+	<script type="text/javascript">
+		function addUser(e) {
+			// e.preventDefault(); 
+			$("#loading").show();
+
+			var firstName = $("#firstName").val();
+			var roleList = [$("#role").val()];
+			var lastName = $("#lastName").val();
+			var phoneNumber = $("#phoneNumber").val();
+			var email = $("#email").val();
+			var username = $("#username").val();
+
+			var UsersObj = {
+				firstName: firstName,
+				lastName: lastName,
+				phoneNumber: phoneNumber,
+				email: email,
+				role: roleList[0],
+				username: username
+			};
+
+			if (email != "" && phoneNumber != "") {
+
+				$.ajax({
+					url: "[[@{/nib/api/add-user}]]",
+					method: "POST",
+					data: JSON.stringify(UsersObj),
+					contentType: 'application/json'
+				}).done(function (data) {
+
+					$("#loading").hide();
+					if (data.status == "00") {
+						swal({
+							title: "Success!",
+							text: "User data added successfully!",
+							icon: "success",
+							button: "Ok"
+						});
+					} else {
+						swal({
+							title: "Error!",
+							text: "There was an error adding data.",
+							icon: "error",
+							button: "Ok"
+						});
+					}
+					$('#add-user-modal').modal('hide');
+					getUserList();
+
+				});
+
+			}
+
+		}
+
+	</script>
+
+	<script type="text/javascript">
+		// function addDonationDetails(e) {
+		$(document).ready(function () {
+			$("#add-donation-form").submit(function (e) {
+
+				$("#loading").show();
+				// const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+				var formData = new FormData(this);
+
+				if (nameD != "" && poster != "") {
+
+					$.ajax({
+
+						'url': "[[@{/nib/api/add-donation-details}]]",
+						'method': "POST",
+						// 'X-CSRF-TOKEN': csrfToken,
+						'data': formData,
+
+						contentType: false, // Important for FormData
+						processData: false,
+
+						success: function (response) {
+							$('#add-donation-form').modal('hide');
+							if (response.status == "00") {
+								swal("Image saved successfully for donation details of " + response.message, "success");
+							} else if (response.status == "06") {
+								swal("There was an error adding data", "Error");
+							}
+							else {
+								swal("Image failed to save:" + " An error occurred!", "Error");
+							}
+						},
+
+						error: function (jqXHR, textStatus, errorThrown) {
+							$('#add-donation-form').modal('hide');
+							// Handle errors during image saving (optional)
+							swal("Error saving image:", textStatus, errorThrown, "Error");
+
+
+						}
+
+					})
+
+				}
+
+			});
+		});
+	</script>
+
+	<script type="text/javascript">
+		// No of Users
+
+		$(document).ready(function () {
+
+			$("#loading").show();
+
+			$.ajax({
+				'url': "[[@{/nib/api/total-users}]]",
+
+				'method': "GET",
+
+				'contentType': 'application/json',
+
+			}).done(function (data) {
+
+				$("#loading").hide();
+
+				var tp
+				if (data.status == "00") {
+
+					tp = "success"
+					if (data.message != null) {
+						$("#totalUsers").html(data.message);
+					}
+
+				} else {
+
+					tp = "warning"
+				}
+
+			});
+
+		});
+
+		$(document).ready(function () {
+
+			$("#loading").show();
+
+			$.ajax({
+				'url': "[[@{/nib/api/total-collections}]]",
+
+				'method': "GET",
+
+				'contentType': 'application/json',
+
+			}).done(function (data) {
+
+				$("#loading").hide();
+
+				var tp
+				if (data.status == "00") {
+
+					tp = "success"
+					if (data.message != null) {
+						$("#totalCollections").html(data.message);
+					}
+
+				} else {
+
+					tp = "warning"
+				}
+
+			});
+
+		});
+
+	</script>
+
+	<script type="text/javascript">
+
+		$(document).ready(function (e) {
+			// e.preventDefault(); 
+			$("#loading").show();
+
+			$.ajax({
+				'url': "[[@{/nib/api/total-amount/USD}]]",
+
+				'method': "GET",
+
+				'contentType': 'application/json',
+
+			}).done(function (data) {
+
+				$("#loading").hide();
+
+				var tp
+				if (data.status == "00") {
+
+					tp = "success"
+					if (data.message != null) {
+						$("#USD").html(data.message);
+					}
+
+				} else {
+
+					tp = "warning"
+				}
+
+			});
+
+		});
+
+
+		$(document).ready(function (e) {
+			// e.preventDefault(); 
+			$("#loading").show();
+
+			$.ajax({
+				'url': "[[@{/nib/api/total-amount/GHS}]]",
+
+				'method': "GET",
+
+				'contentType': 'application/json',
+
+			}).done(function (data) {
+
+				$("#loading").hide();
+
+				var tp
+				if (data.status == "00") {
+
+					tp = "success"
+					if (data.message != null) {
+						$("#GHS").html(data.message);
+					}
+
+				} else {
+
+					tp = "warning"
+				}
+
+			});
+
+		});
+
+
+		$(document).ready(function () {
+			$.ajax({
+				'url': "[[@{/nib/api/roles}]]",
+				'method': "GET",
+
+				'contentType': 'application/json',
+
+			}).done(function (data) {
+
+				if (data.status == "00") {
+					console.log("DATA:: " + data.message)
+
+					populateSelect(data.message);
+
+				} else {
+					console.error("Error:", textStatus, errorThrown);
+				}
+			});
+		});
+
+
+		function populateSelect(data) {
+			var donationSelect = $("#role"); // Replace with your select element ID
+
+			donationSelect.empty(); // Clear existing options
+
+			const donationData = JSON.parse(data);
+
+			$.each(donationData, function (index, donation) {
+				const option = $('<option></option>')
+					.val(donation.id) // Set option value as donation ID
+					.text(donation.name); // Set option text as donation name
+				donationSelect.append(option);
+			});
+		}
+
+	</script>
+
+	<script>
+
+		function triggerDeleteDialogue(e) {
+			// e.preventDefault(); 
+			swal({
+				title: "Are you sure?",
+				text: "Once deleted, you will not be able to recover this record!",
+				icon: "warning",
+				buttons: true,
+				dangerMode: true,
+			})
+				.then((willDelete) => {
+					if (willDelete) {
+						deleteUser(e);
+					}
+				});
+
+		}
+
+		/* 	deleting user */
+		function deleteUser(e) {
+			// e.preventDefault(); 
+			var row = $(e).closest('tr')[0];
+			var id = $(row).find('td:eq(0)').text();
+
+			$.ajax({
+				url: "[[@{/nib/api/delete-user/}]]" + id,
+				method: 'GET'
+
+			}).done(function (resultData) {
+
+				if (resultData.status == "00") {
+					swal("Deleted!", "Your record has been deleted.", "success");
+				} else {
+					swal("Your record is safe!", "failed");
+
+				}
+
+				getUserList();
+			});
+		}
+
+
+		function triggerEnableDialogue(e) {
+			// e.preventDefault(); 
+			var row = $(e).closest('tr')[0];
+			var firstName = $(row).find('td:eq(1)').text();
+			var lastName = $(row).find('td:eq(2)').text();
+
+			swal({
+				title: "Enable?",
+				text: "Request to enable " + firstName + " " + lastName,
+				icon: "warning",
+				buttons: true,
+				dangerMode: true,
+			})
+				.then((willDelete) => {
+					if (willDelete) {
+						enableUser(e);
+					}
+				});
+
+		}
+
+
+		function enableUser(e) {
+			// e.preventDefault(); 
+			var row = $(e).closest('tr')[0];
+			var id = $(row).find('td:eq(0)').text();
+
+			$.ajax({
+				url: "[[@{/nib/api/enable-user/}]]" + id,
+				method: 'GET'
+
+			}).done(function (resultData) {
+
+				if (resultData.status == "00") {
+					swal("Enabled!", "Record has been enabled.", "success");
+				} else {
+					swal("The record wasn't enabled!", "failed");
+
+				}
+
+				getUserList();
+			});
+		}
+
+
+		function triggerDisableDialogue(e) {
+			// e.preventDefault(); 
+			var row = $(e).closest('tr')[0];
+			var firstName = $(row).find('td:eq(1)').text();
+			var lastName = $(row).find('td:eq(2)').text();
+
+			swal({
+				title: "Disable?",
+				text: "Request to disable " + firstName + " " + lastName,
+				icon: "warning",
+				buttons: true,
+				dangerMode: true,
+			})
+				.then((willDelete) => {
+					if (willDelete) {
+						disableUser(e);
+					}
+				});
+
+		}
+
+
+		function disableUser(e) {
+			// e.preventDefault(); 
+			var row = $(e).closest('tr')[0];
+			var id = $(row).find('td:eq(0)').text();
+
+			$.ajax({
+				url: "[[@{/nib/api/disable-user/}]]" + id,
+				method: 'GET'
+
+			}).done(function (resultData) {
+
+				if (resultData.status == "00") {
+					swal("Disabled!", "Record has been disabled.", "success");
+				} else {
+					swal("The record wasn't disabled!", "failed");
+
+				}
+
+				getUserList();
+			});
+		}
+
+	</script>
+
+	<script type="text/javascript"
+		th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js}"></script>
+	<script
+		th:src="@{https://cdnjs.cloudflare.com/ajax/libs/formvalidation/0.6.2-dev/js/formValidation.min.js}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+
+</html>

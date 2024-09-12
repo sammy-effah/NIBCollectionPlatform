@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Insert title here</title>
+</head>
+
+<body>
+
+	<nav class="navbar navbar-default navbar-fixed-bottom" id="footer" role="navigation" th:fragment="bottomContainer"
+		style="min-height: 0.5%;">
+		Brand and toggle get grouped for better mobile display
+		<div class="navbar-header">
+
+			<div>
+				<a style="padding-left: 10px; position: absolute;"> <img alt="image"
+						src="../../static/images/CSC_LOGO.png" th:src="@{/static/images/CSC_LOGO.png}"
+						style="height: 30px;" />
+				</a>
+			</div>
+			<div style="margin-left: 7%; width: 100%; position: relative;">
+				<div style="display: block;">
+					<span class="fa fa-home "></span> &nbsp;226 Osibisa Close, Airport
+					West &nbsp;<span class="fa fa-envelope "></span>&nbsp; P.O. Box KIA
+					30408, Accra, Ghana &nbsp;<span class="fa fa-phone "></span>
+					&nbsp;Telephone: +233-302-782646 / 7 &nbsp;<span class="fa fa-mobile-phone "></span>&nbsp; Fax:
+					+233-302-769622
+				</div>
+			</div>
+		</div>
+		<div style="margin-left: 85%">
+			<label>Version:</label><label th:text="${version}"></label>
+		</div>
+	</nav>
+	<h3>This content is inserted for static prototyping reasons only</h3>
+
+	Wro4j bundle call
+	<div th:fragment="dashboard-js">
+		<script type="text/javascript">
+			$(".tableModal").DataTable();
+
+		</script>
+
+
+
+
+		<!-- Chart code -->
+
+
+		<div th:fragment="footer">
+			<footer class="footer text-right" style="padding-left: 150px;">2024 © NIB Donation Collection.
+
+				<script type="text/javascript">
+					// alert("hi");
+
+					// $.getJSON("https://api.ipify.org?format=json",
+					// 	function (data) {
+
+					// 		$('body').append("<input id='clientIp' name='clientIp' style='display:none' ></div>");
+
+					// 		$("#clientIp").val(data.ip);
+
+					// 	})
+				</script>
+
+
+			</footer>
+		</div>
+
+
+
+
+
+
+</body>
+
+
+</html>

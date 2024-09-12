@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="fragments/header :: head (~{::title})">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+	<meta name="author" content="Coderthemes">
+
+	<link rel="shortcut icon" href="images/favicon_1.ico">
+
+	<title>NIB Collection:: Reset Password</title>
+	<link th:href="@{css/helper.css}" rel="stylesheet" type="text/css" />
+	<link th:href="@{css/style.css}" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+
+	<div class="wrapper-page">
+		<div class="panel panel-color panel-primary panel-pages">
+			<div class="panel-heading bg-img">
+				<div class="bg-overlay"></div>
+				<h3 class="text-center m-t-10 text-white">
+					Change Password to <strong>Funeral Collection Platform</strong>
+				</h3>
+			</div>
+
+			<div class="panel-body">
+				<form class="form-signin form-horizontal m-t-20" id="signupForm" role="form" novalidate="novalidate">
+					<div style="display:none" class="alert alert-info alert-dismissable">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+						Enter your <b>Email</b> and instructions will be sent to you!
+					</div>
+					<div class="form-group">
+
+						<div class="col-xs-12">
+
+							<input type="password" id="oldpass" class="form-control input-lg" required
+								name="oldPassword" placeholder="Password" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-xs-12">
+
+							<input type="password" id="password" class="form-control input-lg" required name="password"
+								placeholder="Confirm Password" />
+
+						</div>
+					</div>
+
+					<div class="form-group text-center m-t-40">
+						<div class="col-xs-12">
+							<button onclick="savePass()" class="btn btn-lg btn-primary btn-block" name="Submit"
+								value="Login" type="Submit" th:text="Change">Log In</button>
+						</div>
+					</div>
+
+					<div class="form-group m-t-30">
+						<div class="col-sm-12 text-center">
+							<a th:href="@{/login}">Login</a>
+						</div>
+					</div>
+				</form>
+			</div>
+
+		</div>
+	</div>
+
+	<script>
+		var resizefunc = [];
+	</script>
+
+	<script th:inline="javascript">
+
+		var getUrlParameter = function getUrlParameter(sParam) {
+			var sPageURL = window.location.search.substring(1),
+				sURLVariables = sPageURL.split('&'),
+				sParameterName,
+				i;
+
+			for (i = 0; i < sURLVariables.length; i++) {
+				sParameterName = sURLVariables[i].split('=');
+
+				if (sParameterName[0] === sParam) {
+					return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+				}
+			}
+		};
+
+
+
+
+		function savePass(e) {
+
+			var oldPassword = $("#oldpass").val();
+			var newPassword = $("#password").val();
+
+			if (oldPassword != "" && newPassword != "") {
+
+				var id = getUrlParameter('id');
+
+				if (oldPassword == newPassword) {
+
+					$.ajax({
+
+						url: "[[@{/registration/user/updatePassword}]]",
+
+						data: {
+
+							id: id,
+							token: token,
+							password: oldPassword,
+							newPassword: newPassword
+
+						},
+
+						method: 'POST'
+					}).then(
+						function (data) {
+
+							/* $(".alert").show();
+							$(".alert").html(data.message); */
+
+
+							if (data.error == "00") {
+
+								$(".alert").removeClass("alert-danger");
+
+								$(".alert").addClass("alert-info");
+
+								$(".alert").show();
+
+								$(".alert").html(data.message);
+
+							}
+							else {
+
+								$(".alert").show();
+
+								$(".alert").html(data.message);
+
+								$(".alert").removeClass("alert-info");
+
+
+								$(".alert").addClass("alert-danger");
+
+							}
+
+							$.each(data, function (index, item) {
+
+							});
+						});
+
+				} else {
+
+					// alert("hi");
+					$(".alert").show();
+
+					$(".alert").html("Passwords don't Match");
+
+					$(".alert").removeClass("alert-info");
+
+					$(".alert").addClass("alert-danger");
+
+				}
+
+			}
+
+		}
+	</script>
+</body>
+
+</html>

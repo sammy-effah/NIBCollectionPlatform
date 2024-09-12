@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{fragments/header :: head (~{::title})}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc.">
+    <meta name="author" content="Coderthemes">
+
+    <link rel="shortcut icon" th:src="@{/images/favicon_1.ico}">
+
+    <title>NIB Collection :: login</title>
+    <!-- Custom Files -->
+    <link th:href="@{/static/css/helper.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/static/css/style.css}" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+    <div class="container" style="padding-top: 5%;">
+
+        <div class="row">
+            <div class="col-md-4 mx-auto">
+                <div class="panel panel-default">
+                    <div class="card">
+                        <span style="text-align: center;">
+                            <img width="90" height="80" 
+                                    th:src="@{https://iili.io/dk9VxEl.jpg}" />
+                                </span>       
+                            <h3 class="card-title"
+                                style="text-align: center; height: 40px;color: whitesmoke; background-color: #4169E1;">
+                                <span style="margin-top: 29px;">  NIB Donation Collection </span>
+                            </h3>
+                        <div class=" card-body">
+                            <form th:object="${credentials}" th:action="@{login}" method="post">
+
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-sm-10">
+                                            <div class="input-group mb-3"
+                                                th:classappend="${#fields.hasErrors('username')}? 'has-error':''">
+                                                <input type="text" class="form-control input-lg" id="username"
+                                                    name="username" th:field="*{username}" autofocus="autofocus"
+                                                    placeholder="Username" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-sm-10">
+                                                <div class="input-group mb-3"
+                                                    th:classappend="${#fields.hasErrors('password')}? 'has-error':''">
+
+                                                    <input type="password" id="password" name="password"
+                                                        class="form-control input-lg" th:field="*{password}"
+                                                        placeholder="Password" required />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <button class="btn btn-md btn-primary btn-block"
+                                                    name="Submit" value="Login" type="Submit" th:text="Login">Log In
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="color:red" th:if="${param.error}">
+                                        Validation error
+                                    </div>
+                                    <div th:if="${param.logout}">
+                                        You have been logged out.
+                                    </div>
+                                    <div class="error" th:if="${param.sessionExpired == true}">
+                                    Session Expired! Please login again.
+                                    </div>
+ 
+                                   
+                            </form>
+                            <div class="form-group m-t-30">
+                                <div class="row">
+                                    <div class="col-sm-7">
+                                        <!-- <a th:href="@{/recoverpw}"><i class="fa fa-lock m-r-5"></i>Forgot your
+                                            password?</a> -->
+                                    </div>
+                                    
+                                    <div class="col-sm-4">
+                                        <!-- <a th:href="@{/resetpw}"><i class="fa fa-lock m-r-5"></i>Reset password</a> -->
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  <!-- Include jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+   <!-- Include jQuery Cookie Plugin -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+   
+    <script type="text/javascript">
+    //     var datar;
+    //      $.getJSON("https://api64.ipify.org?format=json", 
+    //     function(data) { 
+             
+    //          //alert(data.ip);
+    //         datar=data;
+    //         $('#loginForm').append("<input id='clientIp' name='clientIp' style='display:none' ></div>");    
+      
+    //         $("#clientIp").val(datar.ip);
+    //   })  
+      
+      
+        
+      
+      </script>
+      
+
+    <script>
+        var resizefunc = [];
+    </script>
+
+<script type="text/javascript">
+    var csrfToken = $.cookie('CSRF-TOKEN');
+    var csrfHeader = $.cookie('CSRF-HEADER');
+    
+   // $("#csrf").val(csrfToken);
+    
+   // $("#csrf").attr("name",csrfHeader);
+
+    
+    //alert(csrfHeader)
+    
+
+</script>
+
+</body>
+
+</html>
