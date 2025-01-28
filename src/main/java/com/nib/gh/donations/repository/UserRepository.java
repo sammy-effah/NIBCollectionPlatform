@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 
     long count();
 
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN TRUE ELSE FALSE END " +
+    "FROM Users u WHERE LOWER(u.username) = LOWER(:username) AND u.enabled = :enabled")
     boolean existsByUsernameAndEnabled(String username, boolean enabled);
 
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN TRUE ELSE FALSE END " +

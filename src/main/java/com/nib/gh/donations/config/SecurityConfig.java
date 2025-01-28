@@ -7,11 +7,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.boot.web.server.Ssl;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
 
         @Autowired
         private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
@@ -20,6 +22,7 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
                                 .csrf().disable()
+                                .requiresChannel(channel -> channel.anyRequest().requiresSecure()) // Enforces HTTPS
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/nib/api/nia/*").authenticated()
                                                 .anyRequest().authenticated())
@@ -42,8 +45,7 @@ public class SecurityConfig {
                                         response.sendRedirect(request.getContextPath() + "/access-denied");
                                 })
                                 .and()
-                                .httpBasic(); // This replaces withDefaults() for basic authentication
-
+                                .httpBasic(); // Basic authentication
                 return http.build();
         }
 
@@ -56,4 +58,15 @@ public class SecurityConfig {
                 return provider;
         }
 
+        @Bean
+        public WebServerFactoryCustomizer<TomcatServletWebServerFactory> sslCustomizer() {
+                return factory -> {
+                        Ssl ssl = new Ssl();
+                        ssl.setKeyStore("cfg/keystore.jks"); // Path to the keystore file
+                        ssl.setKeyStorePassword("172.17.1.8P@ssw0rd"); // Keystore password
+                        ssl.setKeyAlias("1.8cert"); // Key alias in the keystore
+                        factory.setSsl(ssl);
+                        factory.setPort(9900); // HTTPS port
+                };
+        }
 }

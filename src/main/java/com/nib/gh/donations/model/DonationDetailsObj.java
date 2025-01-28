@@ -4,7 +4,8 @@ import lombok.Data;
 
 @Data
 public class DonationDetailsObj {
-    private String name;
+    private Long id;
+    private String nameD;
     private String poster;
     private String purpose;
     private boolean enabled;

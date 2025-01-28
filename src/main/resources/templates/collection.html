@@ -341,7 +341,7 @@
 												id="add-textbox-btn">Include
 												Items</button> -->
 
-											<button id="btnCollectionAdd" type="submit" onclick="addCollection(this)"
+											<button id="btnCollectionAdd" type="button" onclick="addCollection(event)"
 												class="btn btn-primary ">Add Collection</button>
 											<button type="button" class="btn btn-default waves-effect"
 												data-bs-dismiss="modal">Close</button>
@@ -634,268 +634,190 @@
 	<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js}"></script>
 
 	<script>
+
+		var donationDetailsId = localStorage.getItem('selectedDonationDetailsId');
+
 		getCollectionList();
 
-		function getCollectionList() {
+		// Helper function to format the amount
+		function formatAmount(value) {
+			// Format the value with commas and 2 decimal places
+			return Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		}
 
-			// $("#loading").show();
+		function formatAmount(amount) {
+			return parseFloat(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		}
+
+		function getCollectionList() {
 			const username = $("#loggedInUser").val() || $("#loggedInUser").text().trim();
 
 			var url;
 			if (username === "Samuel.Onwona") {
 				url = "/nib/api/get-data";
 			} else {
-
 				url = "/nib/api/get-data/details-active/" + username;
 			}
 
-			$
-				.ajax({
-
-					// 'url': "[[@{/nib/api/get-data/}]]" + username,
-					'url': url,
-					'method': "GET",
-
-					'contentType': 'application/json'
-				})
-				.done(
-					function (data) {
-
-						$('#datatable')
-							.dataTable(
-								{
-									// "scrollY": 500,
-									"scrollX": true,
-									"processing": true,
-
-									"destroy": true,
-
-									pageLength: 30,
-
-									"aaData": data,
-
-									"dom": 'lBfrtip',
-									buttons: [
-										{
-											extend: 'excelHtml5',
-											text: 'Excel',
-											title: function () {
-												return `NIB Collection Report \n Total in GHS: ${totalGHS}, Total in USD: ${totalUSD}`;
-											},
-											footer: true, // Include footer in the Excel export
-											exportOptions: {
-												columns: [0, 1, 2, 3, 5, 6, 10]  // Exclude Phone
-											}
-										},
-										{
-
-											extend: 'pdfHtml5',
-											text: 'PDF',
-											title: function () {
-												return `NIB Collection Report \n Total in GHS: ${totalGHS}, Total in USD: ${totalUSD}`;
-											},
-											footer: true, // Include footer in the Excel export
-											exportOptions: {
-												columns: [0, 1, 2, 3, 5, 6, 10] // Exclude Phone
-											},
-
-
-											customize: function (doc) {
-
-												var imageUrl = 'data:image/jpeg;base64,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';
-												doc['header'] = (function () {
-													return {
-														columns: [
-															{
-																image: imageUrl,
-																width: 40 // Adjust the width of the image as needed
-															},
-															{
-																text: `NIB Collection Report \n Total in GHS: ${totalGHS}, Total in USD: ${totalUSD}`,
-																alignment: 'center',
-																margin: [10, 0, 0, 0] // Adjust the margins as needed
-															}
-														],
-														margin: [10, 10, 10, 0] // Adjust the margins as needed
-													};
-												});
-
-												// var originalHeader = doc.header;
-												// doc.header = function (pageNumber) {
-												// 	if (pageNumber === 1) {
-												// 		return null;
-												// 	}
-												// 	return originalHeader;
-												// };
-
-												doc.styles.default = {
-													fontSize: 3 // Adjust as needed
-												};
-												// doc.content[1].table.widths = [80, 80, 60, 55, 40, 45, 35, 45, 40, 40]; // Set widths
-												doc.pageMargins = [6, 6, 6, 6];
-												doc.content[1].table.body.forEach(row => {
-													row.forEach(cell => {
-														cell.margin = [1, 1, 1, 1]; // Add margins
-														cell.alignment = 'left'; // Align text
-													});
-												});
-
-											}
-										},
-										{
-											extend: 'csv',
-											text: 'CSV',
-											title: function () {
-												return `NIB Collection Report \n Total in GHS: ${totalGHS}, Total in USD: ${totalUSD}`;
-											},
-											footer: true, // Include footer in the Excel export
-											exportOptions: {
-												columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] // Exclude Phone
-											}
-										},
-
-										'copy',
-
-										{
-											extend: 'print',
-											text: 'Print',
-											title: function () {
-												return `NIB Collection Report \n Total in GHS: ${totalGHS}, Total in USD: ${totalUSD}`;
-											},
-											exportOptions: {
-												columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-											},
-											customize: function (win) {
-												$(win.document.body).find('table').append($('#datatable tfoot').clone());
-											}
-										}
-									],
-
-									order: [3, "desc"],
-
-									"columns": [
-
-										{
-											"data": "receiptNum"
-										},
-
-										{
-											"data": "contributorName"
-										},
-
-										{
-											"data": "phone"
-										},
-
-										{
-											// "data": "date_data",
-											data: "dateData",
-											render: function (data) {
-												// console.log("DATA" + data.dateData)
-												return formatDate(data);
-											}
-
-										},
-
-										{
-											"data": "description"
-										},
-
-										{
-											"data": "amount"
-										},
-										{
-											"data": "currency"
-										},
-										{
-											"data": "beneficiary"
-										},
-
-										{
-											"data": "whoIsEntering"
-										},
-										{
-											"data": "itemsAndQuantity"
-										},
-
-										{
-											"data": "cheque"
-										},
-
-										{
-											"data": "donationDetails.id"
-										},
-
-										{
-											"data": "donationDetails.name"
-										},
-
-
-										{
-											"data": null
-										}
-
-									],
-
-									"columnDefs": [
-
-										{
-											"targets": -1,
-											"data": null,
-											"defaultContent": "<button class='btn btn-default btn-sm update' style='background-color:#5eba7d' onclick='printReceipt(this)' >"
-												+ "<i class='fa fa-saved fa-fw' style='color:#ffffff' ></i>"
-												+ "<span style='color:white'>Print</span></button>"
-										},
-
-										// {
-										// 	targets: [3],
-										// 	"render": function (
-										// 		data) {
-										// 		return moment(
-										// 			data)
-										// 			.format(
-										// 				"DD/MM/YYYY HH:mm:ss")
-										// 	},
-										// },
-
-									]
-
+			$.ajax({
+				'url': url,
+				'method': "GET",
+				'contentType': 'application/json'
+			}).done(function (data) {
+				$('#datatable').dataTable({
+					"scrollX": true,
+					"processing": true,
+					"destroy": true,
+					pageLength: 30,
+					"aaData": data,
+					"dom": 'lBfrtip',
+					buttons: [
+						{
+							extend: 'excelHtml5',
+							text: 'Excel',
+							title: function () {
+								return `NIB Collection Report \n Total in GHS: ${formatAmount(totalGHS)}, Total in USD: ${formatAmount(totalUSD)}`;
+							},
+							footer: true,
+							exportOptions: {
+								columns: [0, 1, 2, 3, 5, 6, 10]  // Exclude Phone
+							}
+						},
+						{
+							extend: 'pdfHtml5',
+							text: 'PDF',
+							title: function () {
+								return `NIB Collection Report \n Total in GHS: ${formatAmount(totalGHS)}, Total in USD: ${formatAmount(totalUSD)}`;
+							},
+							footer: true,
+							exportOptions: {
+								columns: [0, 1, 2, 3, 5, 6, 10] // Exclude Phone
+							},
+							customize: function (doc) {
+								var imageUrl = 'data:image/jpeg;base64,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';
+								// doc['header'] = (function () {
+								doc['header'] = (function (currentPage) {
+									if (currentPage === 1) {
+										return {
+											columns: [
+												{
+													text: `NIB Collection Report \n Total in GHS: ${formatAmount(totalGHS)}, Total in USD: ${formatAmount(totalUSD)}`,
+													alignment: 'left',
+													margin: [10, 0, 0, 0]
+												},
+												{
+													image: imageUrl,
+													width: 40,
+													height: 30,
+													alignment: 'right',
+													margin: [10, 0, 0, 0]
+												}
+											],
+											margin: [10, 10, 10, 0]
+										};
+									}
 								});
 
-					});
+								doc.styles.default = {
+									fontSize: 3
+								};
+								doc.pageMargins = [6, 6, 6, 6];
 
+								// Format the amount field (column 5)
+								doc.content[1].table.body.forEach(function (row, rowIndex) {
+									if (rowIndex > 0) { // Skip the header row
+										// Assuming column 5 is the amount
+										row[4].text = formatAmount(row[4].text); // Apply formatting
+									}
+									row.forEach(cell => {
+										cell.margin = [1, 1, 1, 1];
+										cell.alignment = 'left';
+									});
+								});
+							}
+						},
+						{
+							extend: 'csv',
+							text: 'CSV',
+							title: function () {
+								return `NIB Collection Report \n Total in GHS: ${formatAmount(totalGHS)}, Total in USD: ${formatAmount(totalUSD)}`;
+							},
+							footer: true,
+							exportOptions: {
+								columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+							}
+						},
+						'copy',
+						{
+							extend: 'print',
+							text: 'Print',
+							title: function () {
+								return `NIB Collection Report \n Total in GHS: ${formatAmount(totalGHS)}, Total in USD: ${formatAmount(totalUSD)}`;
+							},
+							exportOptions: {
+								columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+							},
+							customize: function (win) {
+								$(win.document.body).find('table').append($('#datatable tfoot').clone());
+							}
+						}
+					],
+					order: [3, "desc"],
+					"columns": [
+						{ "data": "receiptNum" },
+						{ "data": "contributorName" },
+						{ "data": "phone" },
+						{
+							data: "dateData",
+							render: function (data) {
+								return formatDate(data);
+							}
+						},
+						{ "data": "description" },
+						{
+							"data": "amount",
+							// render: function (data) {
+							// 	return formatAmount(data); // Format the amount with commas and 2 decimal places
+							// }
+						},
+						{ "data": "currency" },
+						{ "data": "beneficiary" },
+						{ "data": "whoIsEntering" },
+						{ "data": "itemsAndQuantity" },
+						{ "data": "cheque" },
+						{ "data": "donationDetails.id" },
+						{ "data": "donationDetails.name" },
+						{ "data": null }
+					],
+					"columnDefs": [
+						{
+							"targets": -1,
+							"data": null,
+							"defaultContent": "<button class='btn btn-default btn-sm update' style='background-color:#5eba7d' onclick='printReceipt(this)' >"
+								+ "<i class='fa fa-saved fa-fw' style='color:#ffffff' ></i>"
+								+ "<span style='color:white'>Print</span></button>"
+						}
+					]
+				});
+			});
 		}
 
-		// function formatDate(dateArray) {
-		// 	// Create a date object from the array
-		// 	var date = new Date(Date.UTC(dateArray[0], dateArray[1] - 1, dateArray[2], dateArray[3], dateArray[4], dateArray[5]));
-		// 	var year = date.getFullYear();
-		// 	var month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero
-		// 	var day = String(date.getDate()).padStart(2, '0'); // Add leading zero
-		// 	var hours = String(date.getHours()).padStart(2, '0'); // Add leading zero
-		// 	var minutes = String(date.getMinutes()).padStart(2, '0'); // Add leading zero
-		// 	var seconds = String(date.getSeconds()).padStart(2, '0'); // Add leading zero
 
-		// 	// Return formatted date
-		// 	return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-		// }
+
+		function formatNumber(num) {
+			return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+		}
 
 		function formatDate(dateArray) {
 			// Ensure dateArray has at least 5 elements
 			if (dateArray.length < 5) {
-				console.error("Invalid dateArray format");
 				return "Invalid date";
 			}
 
-			// Log the dateArray for debugging
-			console.log("dateArray:", dateArray);
-
-			// Create a date object from the array
 			var date = new Date(Date.UTC(dateArray[0], dateArray[1] - 1, dateArray[2], dateArray[3], dateArray[4], dateArray[5] || 0));
 
 			// Check if date is valid
 			if (isNaN(date.getTime())) {
-				console.error("Invalid Date object:", date);
 				return "Invalid date";
 			}
 
@@ -986,8 +908,6 @@
 						getCollectionList(); // 
 					},
 					error: function (xhr, status, error) {
-						console.error("AJAX Error:", status, error);
-						console.log("XHR:", xhr);
 						$("#loading").hide();
 						swal({
 							title: "Error!",
@@ -1364,9 +1284,22 @@
 	</script>
 
 	<script type="text/javascript">
-		function addCollection(e) {
 
-			$("#loading").show();
+		function getRef(size) {
+			let value = "";
+			for (let t = 0; t < size; t++) {
+				value += Math.floor(Math.random() * 9); // Generates a random digit between 0 and 8
+			}
+			return "NIBFC" + value;
+		}
+
+
+		function addCollection(e) {
+			// e.preventDefault(); 
+
+			if (e && e.preventDefault) {
+				e.preventDefault(); // Prevent the form from submitting
+			}
 
 			var contributor = $("#contributor").val();
 
@@ -1390,6 +1323,16 @@
 			const checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
 			const values = Array.from(checkboxes).map(checkbox => checkbox.value);
 
+			const now = new Date();
+			const formattedDateTime = now.getFullYear() + '-' +
+				String(now.getMonth() + 1).padStart(2, '0') + '-' +
+				String(now.getDate()).padStart(2, '0') + ' ' +
+				String(now.getHours()).padStart(2, '0') + ':' +
+				String(now.getMinutes()).padStart(2, '0') + ':' +
+				String(now.getSeconds()).padStart(2, '0');
+
+			const receiptNum = getRef(8);
+
 			var CollectionObj = {};
 			var itemsAndQuantity = "";
 			for (let i = 0; i < values.length; i++) {
@@ -1397,68 +1340,57 @@
 				itemsAndQuantity += "" + (element + " - " + $("#" + element + "_quantity").val()) + "~";
 
 			}
-			CollectionObj['itemsAndQuantity'] = itemsAndQuantity;
 
-			CollectionObj["contributorName"] = contributor;
+			if (contributor !== "" && amount !== "" && phone !== "") {
 
-			CollectionObj["phone"] = phone;
+				CollectionObj['itemsAndQuantity'] = itemsAndQuantity;
 
-			CollectionObj["description"] = description;
+				CollectionObj["contributorName"] = contributor;
 
-			CollectionObj["amount"] = amount;
+				CollectionObj["phone"] = phone;
 
-			CollectionObj["beneficiary"] = beneficiary;
+				CollectionObj["description"] = description;
 
-			CollectionObj["currency"] = currency;
+				CollectionObj["amount"] = amount;
 
-			CollectionObj["cheque"] = cheque;
+				CollectionObj["beneficiary"] = beneficiary;
 
-			CollectionObj["whoIsEntering"] = username;
+				CollectionObj["currency"] = currency;
 
-			CollectionObj["whoseDonation"] = donation_details
+				CollectionObj["cheque"] = cheque;
 
-			// const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+				CollectionObj["whoIsEntering"] = username;
 
-			if (contributor != "") {
+				CollectionObj["receiptNum"] = receiptNum;
+
+				CollectionObj["whoseDonation"] = donation_details
 
 				$.ajax({
-					'url': "[[@{/nib/api/add-data}]]",
-
-					'method': "POST",
-
-					'data': JSON.stringify(CollectionObj),
-
-					'contentType': 'application/json',
-
-				}).done(function (data) {
-
-					$("#loading").hide();
-
-					$('#add-collection-modal').modal('hide');
-
-
-					printReceiptImmediately(receiptNum, amount, currency, contributor, date, donation_details.id);
-					if (data.status == "00") {
-						swal({
-							title: "Success!",
-							text: "Data added successfully!",
-							icon: "success",
-							button: "Ok",
-							button: true
-						});
-					} else {
-						swal({
-							title: "Error!",
-							text: "There was an error adding data.",
-							icon: "error",
-							button: "Ok",
-							button: true
-						});
-					}
-
-					getCollectionList();
-
-				});
+					url: "/nib/api/add-data",  // Ensure this endpoint is correct
+					method: "POST",
+					data: JSON.stringify(CollectionObj),
+					contentType: 'application/json',
+					timeout: 5000,  // 5 seconds timeout
+				})
+					.done(function (data) {
+						$("#loading").hide();
+						$('#add-collection-modal').modal('hide');
+						console.log("STATUS:: " + data.status)
+						if (data.status === "00") {
+							// Successful response received, initiate print
+							printReceiptImmediately(receiptNum, amount, currency, contributor, formattedDateTime, donation_details, itemsAndQuantity);
+						} else {
+							showError("There was an error adding data.");
+						}
+						getCollectionList();
+					})
+					.fail(function (jqXHR, textStatus, errorThrown) {
+						if (textStatus === "timeout") {
+							showError("Request timed out. Please try again.");
+						} else {
+							showError("An error occurred while adding data.");
+						}
+					});
 
 			}
 
@@ -1547,87 +1479,110 @@
 
 
 
-		function printReceiptImmediately(receiptNum, amount, currency, contributor, date, donation_details_id) {
-
+		function printReceiptImmediately(receiptNum, amount, currency, contributor, date, donation_details_id, addedItems) {
 			$.ajax({
-				'url': "[[@{/nib/api/get-donation-details/}]]" + donation_details_id,
-
-				'method': "GET",
-
-				'contentType': 'application/json',
-
-			}).done(function (data) {
-
-				if (data.status == "00") {
-					const jsonObject = JSON.parse(data.message);
-
-					var baseUrl = window.location.origin;
-					let receiptContent = `<h6 class="card-title">Receipt Number: ` + receiptNum + `</<h6>
-				<h6>Date: ` + date + `</h6>
-				<h6>Received from: ` + contributor + `</6>
-				<h6>Amount: ` + currency + ` ` + amount + `</h6>
-				<h6>Other Items: ` + addedItems + `</h6>
-				<p style="padding-top: 3px;"></p>`;
-
-					// console.log('PIC LOCATION:: ' + jsonObject.picLocation);
-					var printWindow = window.open('', '', 'height=800,width=700');
-
-					if (printWindow) {
-
-						printWindow.document.write('<!DOCTYPE html>');
-						printWindow.document.write('<html xmlns:th="http://www.thymeleaf.org"><head><title>Print Receipt</title>');
-						printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">');
-						printWindow.document.write('<style>');
-						printWindow.document.write('.watermarked {position: relative;}');
-						printWindow.document.write('.watermarked:after {content: "";display: block;width: 100%;height: 100%;position: absolute;top: 0px;left: 0px;background-image: url("' + jsonObject.picLocation + '");background-size: 100px 100px;background-position: 30px 30px;background-repeat: no-repeat;opacity: 0.7;}');
-						printWindow.document.write('@media print {body { margin: 0;padding: 0;width: 60%;height: 60%;} .receipt {width: 100%;padding: 20px;}}');
-						printWindow.document.write('</style>');
-						printWindow.document.write('</head><body>');
-						printWindow.document.write('<div class="receipt">');
-						printWindow.document.write('<h3>' + jsonObject.purpose + '  of ' + jsonObject.name + '</h3>');
-						printWindow.document.write('<div class="watermarked"></div>');
-						printWindow.document.write('<div class="row">');
-						printWindow.document.write('<div class="col-md-6">');
-						printWindow.document.write('<p style="padding-top: 4px;"></p>');
-						printWindow.document.write(receiptContent);
-						printWindow.document.write('<p style="margin-bottom: 10px;"></p>');
-						printWindow.document.write('</div>');
-						printWindow.document.write('<div class="col-md-1">');
-						printWindow.document.write('<img src="' + jsonObject.picLocation + '" width="170" height="150" style="width:200px;  border-radius: 50%;"');
-						printWindow.document.write('</div>');
-						printWindow.document.write('<div class="col-md-5" >');
-						printWindow.document.write('</div>');
-						printWindow.document.write('</div>');
-						printWindow.document.write('</div>');
-						printWindow.document.write('</body></html>');
-						printWindow.focus();
-						printWindow.document.close();
-
-						printWindow.print();
-
-						printWindow.addEventListener('afterprint', function () {
-							printWindow.close();
-						});
-
-						setTimeout(function () {
-							if (!printWindow.closed) {
-								printWindow.close();
-							}
-						}, 1000);
+				url: "/nib/api/get-donation-details/" + donation_details_id,
+				method: "GET",
+				contentType: 'application/json'
+			})
+				.done(function (data) {
+					console.log(data);
+					if (data.status === "00") {
+						renderAndOpenPrintWindow(data, receiptNum, amount, currency, contributor, date, addedItems);
 					} else {
-						console.error('Failed to open the print window');
-						alert('Failed to open the print window. Please allow popups for this site.');
+						showError("Couldn't retrieve donation details.");
 					}
-				} else {
+				})
+				.fail(function (jqXHR, textStatus) {
+					showError("Failed to retrieve donation details.");
+				});
+		}
 
-					alert("Couldn't get donation details.")
-				}
+		function renderAndOpenPrintWindow(data, receiptNum, amount, currency, contributor, date, addedItems) {
+			const jsonObject = JSON.parse(data.message);
+			let receiptContent = `<h6 class="card-title">Receipt Number: ${receiptNum}</h6>
+        <h6>Date: ${date}</h6>
+        <h6>Received from: ${contributor}</h6>
+        <h6>Amount: ${currency} ${amount}</h6>
+        <h6>Other Items: ${addedItems}</h6>`;
+			console.log("DECEASED:: " + jsonObject.name)
+			let printWindow = window.open('', '', 'height=800,width=700');
+			if (printWindow) {
+				printWindow.document.write('<!DOCTYPE html>');
+				printWindow.document.write('<html><head><title>Print Receipt</title>');
+				printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">');
+				printWindow.document.write('<style>');
+				printWindow.document.write('.watermarked {position: relative;}');
+				printWindow.document.write('.watermarked:after {content: "";display: block;width: 100%;height: 100%;position: absolute;top: 0px;left: 0px;background-image: url("' + jsonObject.picLocation + '");background-size: 100px 100px;background-position: 30px 30px;background-repeat: no-repeat;opacity: 0.7;}');
+				printWindow.document.write('@media print {body { margin: 0;padding: 0;width: 60%;height: 60%;} .receipt {width: 100%;padding: 20px;}}');
+				printWindow.document.write('</style>');
+				printWindow.document.write('</head><body>');
+				printWindow.document.write('<div class="receipt">');
+				printWindow.document.write('<h5>' + jsonObject.purpose + ' of ' + jsonObject.name + '</h5>');
+				printWindow.document.write('<div class="watermarked"></div>');
+				printWindow.document.write('<div class="row">');
+				printWindow.document.write('<div class="col-md-9">');
+				printWindow.document.write('<p style="padding-top: 4px;"></p>');
+				printWindow.document.write(receiptContent);
+				printWindow.document.write('<p style="margin-bottom: 10px;"></p>');
+				printWindow.document.write('</div>');
+				printWindow.document.write('<div class="col-md-3">');
+				printWindow.document.write('<img src="' + jsonObject.picLocation + '" width="150" height="130" style="width:200px; border-radius: 50%;" />');
+				printWindow.document.write('</div>');
+				printWindow.document.write('</div>');
+				printWindow.document.write('</div>');
+				printWindow.document.write('</body></html>');
+				printWindow.document.close();
+				cleanupBackgroundOverlay();
 
-			});
+				// Delay closing the print window to ensure print dialog appears
+				setTimeout(function () {
+					printWindow.focus(); // Ensure the print window is focused
+					printWindow.print();
+				}, 100);
 
+				printWindow.addEventListener('afterprint', function () {
+					printWindow.close();
+					cleanupBackgroundOverlay();
+				});
+
+			} else {
+				showError("Please enable popups to print receipts.");
+			}
 		}
 
 
+		function cleanupBackgroundOverlay() {
+			const backdrops = document.querySelectorAll('.modal-backdrop');
+			backdrops.forEach((backdrop) => backdrop.remove());
+			document.body.classList.remove('modal-open');
+			document.body.style.overflow = '';
+		}
+
+		function generatePrintHTML(jsonObject, receiptContent) {
+			return `
+        <!DOCTYPE html>
+        <html><head><title>Print Receipt</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+        <style>
+            .watermarked { position: relative; }
+            .watermarked:after { content: ""; display: block; width: 100%; height: 100%; position: absolute;
+                top: 0px; left: 0px; background-image: url("${jsonObject.picLocation}");
+                background-size: 100px 100px; background-position: 30px 30px; background-repeat: no-repeat; opacity: 0.7; }
+        </style>
+        </head><body>
+        <div class="receipt">${receiptContent}</div>
+        </body></html>`;
+		}
+
+		function showError(message) {
+			swal({
+				title: "Error!",
+				text: message,
+				icon: "error",
+				button: "Ok"
+			});
+		}
 
 		function showBtnAdd(e) {
 			// e.preventDefault(); 

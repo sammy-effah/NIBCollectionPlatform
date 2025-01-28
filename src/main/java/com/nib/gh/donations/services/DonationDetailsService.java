@@ -12,6 +12,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.nib.gh.donations.model.DonationDetails;
+import com.nib.gh.donations.model.DonationDetailsObj;
+import com.nib.gh.donations.model.UserDTO;
+import com.nib.gh.donations.model.Users;
 import com.nib.gh.donations.repository.DonationDetailsRepository;
 
 @Service
@@ -51,6 +54,21 @@ public class DonationDetailsService {
         return respMsg;
     }
 
+    public String updateDonationDetails(DonationDetailsObj donationDetailsObj) {
+        Optional<DonationDetails> donationDetailsOpt = donationDetailsRepository.findById(donationDetailsObj.getId());
+        if (donationDetailsOpt.isPresent()) {
+            DonationDetails donationDetails = donationDetailsOpt.get();
+            donationDetails.setName(donationDetailsObj.getNameD());
+            donationDetails.setPicLocation(donationDetailsObj.getPoster());
+            donationDetails.setPurpose(donationDetailsObj.getPurpose());
+
+            donationDetailsRepository.save(donationDetails);
+            return "00#Successful";
+        } else {
+            return "06#Failed, user not present";
+        }
+    }
+
     public static String getRef(int size) {
         String value = "";
         for (int t = 0; t < size; t++) {
@@ -79,7 +97,6 @@ public class DonationDetailsService {
         return donationDetailsRepository.findById(id);
     }
 
-
     public boolean deleteById(long id) {
         try {
 
@@ -87,7 +104,6 @@ public class DonationDetailsService {
             // logger.info("USER DATA TO DELETE:: " + userOptional);
             if (donateOptional.isPresent()) {
                 DonationDetails donateeDetails = donateOptional.get();
-              
 
                 donationDetailsRepository
                         .deleteById(donateeDetails.getId());

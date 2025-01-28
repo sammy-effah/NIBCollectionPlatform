@@ -83,6 +83,25 @@ public class UserService {
         return respMsg;
     }
 
+    @SuppressWarnings("deprecation")
+    public String updateUser(UserDTO userDTO) {
+        Optional<Users> userOpt = userRepository.findById(userDTO.getId());
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setEmail(userDTO.getEmail());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
+            user.setUsername(userDTO.getUsername());
+            user.setRoles(roleRepository.getById(Long.parseLong(userDTO.getRole())));
+
+            userRepository.save(user);
+            return "00#Successful";
+        } else {
+            return "06#Failed, user not present";
+        }
+    }
+
     public boolean deleteById(long id) {
         try {
 

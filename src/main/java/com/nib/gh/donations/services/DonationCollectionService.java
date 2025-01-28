@@ -124,7 +124,8 @@ public class DonationCollectionService {
                     collectionData.setWhoIsEntering(collectionDTO.getWhoIsEntering());
                     collectionData.setDonationDetails(donationDetails);
                     collectionData.setItemsAndQuantity(collectionDTO.getItemsAndQuantity());
-                    collectionData.setReceiptNum(getRef(8));
+                    // collectionData.setReceiptNum(getRef(8));
+                    collectionData.setReceiptNum(collectionDTO.getReceiptNum());
                     collectionData.setCurrency(collectionDTO.getCurrency());
                     collectionData.setCheque(collectionDTO.getCheque());
 

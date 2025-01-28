@@ -243,6 +243,82 @@
 
 						</div>
 
+
+						<div id="edit-donation-modal" class="modal fade" tabindex="-1" role="dialog"
+							aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+							<div class="modal-dialog" style="width: 30%;">
+								<div class="modal-content">
+
+									<form id="edit-donation-form" action="#" method="" novalidate>
+										<div class="modal-header">
+											<button type="button" class="close" data-bs-dismiss="modal"
+												aria-hidden="true">×</button>
+											<h4 class="modal-title">Edit Donation Details</h4>
+										</div>
+										<div class="modal-body">
+											<div class="row">
+												<input type="text" class="form-control" name="id" id="id"
+													style="display:none;">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="nameDEdit" class="control-label">
+															Name of Donatee</label>
+														<input type="text" class="form-control" name="nameDEdit"
+															id="nameDEdit">
+													</div>
+												</div>
+
+											</div>
+
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="posterEdit" class="control-label">Image URL of
+															Donatee
+														</label> <input type="text" class="form-control" id="posterEdit"
+															aria-describedby="basic-addon1" name="posterEdit">
+
+													</div>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-6">
+													<div class="mb-3">
+														<label for="purposeEdit" class="control-label">Purpose
+														</label> <select class="form-select" id="purposeEdit"
+															name="purposeEdit">
+															<option>Select Purpose</option>
+															<option value="Funeral">Funeral</option>
+															<option value="One Week Observation">One Week
+																Observation
+															</option>
+															<option value="Ordination">Ordination</option>
+															<option value="Others">Others</option>
+														</select>
+													</div>
+												</div>
+											</div>
+
+
+										</div>
+
+
+										<div class="modal-footer">
+											<button id="btnEdit" type="submit" onclick="editDetails(this)"
+												class="btn btn-primary ">Edit Donation
+												Details</button>
+											<button type="button" class="btn btn-default waves-effect"
+												data-bs-dismiss="modal">Close</button>
+										</div>
+
+
+									</form>
+								</div>
+							</div>
+
+						</div>
+
 					</div>
 					<!-- /.modal -->
 
@@ -464,28 +540,22 @@
 
 												if (data.enabled === true) {
 													return "<button class='btn btn-warning btn-sm warning' style='background-color:#ffA500' onclick='triggerDisableDialogue(this)'>" +
-														"<span style='color:#ffffff'>Disable</span></button>" + "<button class='btn btn-default btn-sm save' style='background-color:#f44336' onclick='triggerDeleteDialogue(this)'>" +
+														"<span style='color:#ffffff'>Disable</span></button>" +
+														"<button class='btn btn-default btn-sm save' style='background-color:#00008b' onclick='triggerEditModal(this)'>" +
+														"<span style='color:#ffffff'>Edit</span></button>" +
+														"<button class='btn btn-default btn-sm save' style='background-color:#f44336' onclick='triggerDeleteDialogue(this)'>" +
 														"<span style='color:#ffffff'>Delete</span></button>";
 												} else {
 													return "<button class='btn btn-default btn-sm update' style='background-color:#5eba7d' onclick='triggerEnableDialogue(this)'>" +
 														"<span style='color:#ffffff'>Enable</span></button>" +
+														"<button class='btn btn-default btn-sm save' style='background-color:#00008b' onclick='triggerEditModal(this)'>" +
+														"<span style='color:#ffffff'>Edit</span></button>" +
 														"<button class='btn btn-default btn-sm save' style='background-color:#f44336' onclick='triggerDeleteDialogue(this)'>" +
 														"<span style='color:#ffffff'>Delete</span></button>";
 												}
 
 											}
 										},
-
-										// {
-										// 	targets: [4],
-										// 	"render": function (
-										// 		data) {
-										// 		return moment(
-										// 			data)
-										// 			.format(
-										// 				"DD/MM/YYYY HH:mm:ss")
-										// 	},
-										// },
 
 									]
 
@@ -526,16 +596,15 @@
 			var email = $("#email").val();
 			var username = $("#username").val();
 
-			var UsersObj = {
-				firstName: firstName,
-				lastName: lastName,
-				phoneNumber: phoneNumber,
-				email: email,
-				role: roleList[0],
-				username: username
-			};
-
 			if (email != "" && phoneNumber != "") {
+				var UsersObj = {
+					firstName: firstName,
+					lastName: lastName,
+					phoneNumber: phoneNumber,
+					email: email,
+					role: roleList[0],
+					username: username
+				};
 
 				$.ajax({
 					url: "[[@{/nib/api/add-user}]]",
@@ -563,6 +632,70 @@
 					$('#add-user-modal').modal('hide');
 					getDonateDetailsList();
 
+				}).fail(function (jqXHR, textStatus, errorThrown) {
+					console.error("Error occurred: " + textStatus, errorThrown);
+					swal("An error occurred while fetching data", "Error");
+				});
+
+			}
+
+		}
+
+
+		function editDetails(e) {
+			// e.preventDefault(); 
+			$("#loading").show();
+
+			var id = $("#id").val();
+			var nameD = $("#nameDEdit").val();
+			var poster = [$("#posterEdit").val()];
+			var purpose = $("#purposeEdit").val();
+
+			console.log("ID:: " + id)
+			console.log("POSTER :: " + poster)
+			console.log("PURPOSE:: " + purpose)
+			console.log("NAME:: " + nameD)
+
+			if (id != "" && nameD != "" && poster != "") {
+
+				var detailsObj = {
+					id: id,
+					nameD: nameD,
+					poster: poster[0],
+					purpose: purpose
+				};
+
+				console.log("DETAILS:: " + JSON.stringify(detailsObj))
+
+				$.ajax({
+					url: "[[@{/nib/api/edit-funeral-details}]]",
+					method: "POST",
+					data: JSON.stringify(detailsObj),
+					contentType: 'application/json'
+				}).done(function (data) {
+
+					$("#loading").hide();
+					if (data.status == "00") {
+						swal({
+							title: "Success!",
+							text: "User data added successfully!",
+							icon: "success",
+							button: "Ok"
+						});
+					} else {
+						swal({
+							title: "Error!",
+							text: "There was an error adding data.",
+							icon: "error",
+							button: "Ok"
+						});
+					}
+					$('#add-user-modal').modal('hide');
+					getDonateDetailsList();
+
+				}).fail(function (jqXHR, textStatus, errorThrown) {
+					console.error("Error occurred: " + textStatus, errorThrown);
+					swal("An error occurred while fetching data", "Error");
 				});
 
 			}
@@ -572,6 +705,7 @@
 	</script>
 
 	<script type="text/javascript">
+
 		// function addDonationDetails(e) {
 		$(document).ready(function () {
 			$("#add-donation-form").submit(function (e) {
@@ -796,6 +930,27 @@
 	</script>
 
 	<script>
+
+		function triggerEditModal(e) {
+			// Optionally, you can retrieve data from the button's row to populate the modal
+			var row = $(e).closest('tr')[0];
+
+			var id = $(row).find('td:eq(0)').text();
+			var donateeName = $(row).find('td:eq(2)').text();
+			var picLocation = $(row).find('td:eq(3)').text();
+			var purpose = $(row).find('td:eq(4)').text();
+
+			console.log("ID EDIT:: " + id)
+
+			$('#id').val(id);
+			$('#nameDEdit').val(donateeName); // Assuming input field has ID 'editFirstName'
+			$('#posterEdit').val(picLocation);
+			$('#purposeEdit').val(purpose);
+
+			// Open the modal
+			$('#edit-donation-modal').modal('show');
+		}
+
 
 		function triggerDeleteDialogue(e) {
 			// e.preventDefault(); 

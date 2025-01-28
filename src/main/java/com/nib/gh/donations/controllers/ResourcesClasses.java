@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -68,24 +69,32 @@ public class ResourcesClasses {
     }
 
     @PostMapping("/add-data")
-    public ResponseData addCollectionData(@RequestBody CollectionDTO collectionDTO) {
+    public ResponseEntity<?> addCollectionData(@RequestBody CollectionDTO collectionDTO) {
         logger.info("REQUEST DATA:: " + collectionDTO);
+        try {
+            if (collectionDTO != null) {
+                String respMsg = donationCollectionService.saveCollectionData(collectionDTO);
+                logger.info("RESPONSE:: " + respMsg);
 
-        if (collectionDTO != null) {
-            String respMsg = donationCollectionService.saveCollectionData(collectionDTO);
-            logger.info("RESPONSE:: " + respMsg);
+                // Assuming `respMsg.split("#")[0]` checks the status code
+                if (respMsg.split("#")[0].equals("00")) {
 
-            // Assuming `respMsg.split("#")[0]` checks the status code
-            if (respMsg.split("#")[0].equals("00")) {
+                    return ResponseEntity.ok(new ResponseData("00", "Added Successfully"));
 
-                return new ResponseData("00", "Added Successfully");
+                } else {
+                    return ResponseEntity.ok(new ResponseData("06", "Failed"));
+
+                }
+
             } else {
-                return new ResponseData("06", "Failed");
-            }
 
-        } else {
-            return new ResponseData("06", "Collection data is empty");
+                return ResponseEntity.badRequest().body(new ResponseData("06", "Collection data is empty"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ResponseData("06", "Exception has occurred!"));
+
         }
+
     }
 
     @PutMapping("/update-data")
@@ -135,6 +144,18 @@ public class ResourcesClasses {
         logger.info("RESPONSE:: " + respMsg);
         if (respMsg.split("#")[0].equals("00"))
             return new ResponseData("00", "Added successfully");
+        else
+            return new ResponseData("06", "Failed");
+
+    }
+
+    @PostMapping("/update-user")
+    public ResponseData editUsers(@RequestBody UserDTO user) {
+        logger.info("REQUEST:: " + user);
+        String respMsg = userService.updateUser(user);
+        logger.info("RESPONSE:: " + respMsg);
+        if (respMsg.split("#")[0].equals("00"))
+            return new ResponseData("00", "Updated successfully");
         else
             return new ResponseData("06", "Failed");
 
@@ -285,6 +306,18 @@ public class ResourcesClasses {
 
         if (donationDetailsService.disableById(id))
             return new ResponseData("00", "Added successfully");
+        else
+            return new ResponseData("06", "Failed");
+
+    }
+
+    @PostMapping("/edit-funeral-details")
+    public ResponseData editFuneralDetails(@RequestBody DonationDetailsObj donationDetails) {
+        logger.info("REQUEST:: " + donationDetails);
+        String respMsg = donationDetailsService.updateDonationDetails(donationDetails);
+        logger.info("RESPONSE:: " + respMsg);
+        if (respMsg.split("#")[0].equals("00"))
+            return new ResponseData("00", "Updated successfully");
         else
             return new ResponseData("06", "Failed");
 
