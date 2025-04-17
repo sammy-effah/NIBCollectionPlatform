@@ -23,6 +23,7 @@ public class DonationDetails {
     private String picLocation;
     private String purpose;
     private boolean enabled;
+    private String location;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Timestamp date;

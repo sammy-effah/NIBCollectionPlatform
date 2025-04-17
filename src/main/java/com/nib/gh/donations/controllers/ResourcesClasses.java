@@ -51,21 +51,22 @@ public class ResourcesClasses {
     @Autowired
     private T24FundsTransferService t24FundsTransferService;
 
-    @GetMapping("/get-data")
+    @GetMapping("/get-data/{donationDetailsId}")
     // @ResponseBody
-    public List<DonationCollection> getCollectionData() {
-        return donationCollectionService.findAll();
+    public List<DonationCollection> getCollectionData(@PathVariable("donationDetailsId") Long id) {
+        logger.info("DONATEE ID:: " + id);
+        return donationCollectionService.findAllByDonationDetails(id);
     }
 
-    @GetMapping("/get-data/{user}")
+    @GetMapping("/get-data/{user}/{donationDetailsId}")
     // @ResponseBody
-    public List<DonationCollection> getCollectionDataByUser(@PathVariable("user") String user) {
-        return donationCollectionService.findAllByUser(user);
+    public List<DonationCollection> getCollectionDataByUser(@PathVariable("user") String user, @PathVariable("donationDetailsId") Long id) {
+        return donationCollectionService.findAllByUser(user, id);
     }
 
-    @GetMapping("/get-data/details-active/{user}")
-    public List<DonationCollection> getCollectionDataByUserAndDetailsEnabled(@PathVariable("user") String user) {
-        return donationCollectionService.getAllDonationCollectionsWithEnabledDetails(user);
+    @GetMapping("/get-data/details-active/{user}/{donationDetailsId}")
+    public List<DonationCollection> getCollectionDataByUserAndDetailsEnabled(@PathVariable("user") String user, @PathVariable("donationDetailsId") Long id) {
+        return donationCollectionService.getAllDonationCollectionsWithEnabledDetails(user, id);
     }
 
     @PostMapping("/add-data")
@@ -212,11 +213,11 @@ public class ResourcesClasses {
 
     }
 
-    @GetMapping("/total-collections")
-    public ResponseData countCollections() {
+    @GetMapping("/total-collections/{donation_details_id}")
+    public ResponseData countCollections(@PathVariable("donation_details_id") long donation_details_id) {
 
         try {
-            String numOfCollection = donationCollectionService.countCollections();
+            String numOfCollection = donationCollectionService.countCollections(donation_details_id);
             if (numOfCollection != null) {
                 return new ResponseData("00", numOfCollection);
             } else {
@@ -278,6 +279,7 @@ public class ResourcesClasses {
         }
     }
 
+
     @GetMapping("/delete-donatee/{donate_details_id}")
     public ResponseData deleteDonateDetails(@PathVariable("donate_details_id") long id) {
         logger.info("REQUESTED ID:: " + id);
@@ -335,13 +337,13 @@ public class ResourcesClasses {
         }
     }
 
-    @GetMapping("/total-amount/{currency}")
-    public ResponseData sumOfAmountInCurrency(@PathVariable("currency") String currency) {
+    @GetMapping("/total-amount/{currency}/{donationDetailsId}")
+    public ResponseData sumOfAmountInCurrency(@PathVariable("currency") String currency, @PathVariable("donationDetailsId") long id) {
         double sumOfAmount = 0;
         try {
 
             // sumOfAmount = donationCollectionService.sumCollectionsByCurrency(currency);
-            sumOfAmount = donationCollectionService.sumCollectionsByCurrencyAndDetailsId(currency);
+            sumOfAmount = donationCollectionService.sumCollectionsByCurrencyAndDetailsId(currency, id);
             return new ResponseData("00", String.valueOf(Math.round(sumOfAmount)));
         } catch (Exception e) {
             logger.error("Exception:: " + e.getMessage());
@@ -349,11 +351,11 @@ public class ResourcesClasses {
         }
     }
 
-    @GetMapping("/sum-amount/teller/{whoseEntering}")
-    public ResponseData sumOfAmountInGHSForWhoseEntering(@PathVariable("whoseEntering") String whoseEntering) {
+    @GetMapping("/sum-amount/teller/{whoseEntering}/{donationDetailsId}")
+    public ResponseData sumOfAmountInGHSForWhoseEntering(@PathVariable("whoseEntering") String whoseEntering,  @PathVariable("donationDetailsId") long id) {
         double sumOfAmount = 0;
         try {
-            sumOfAmount = donationCollectionService.sumCollectionsInGHSForWhoseEntering(whoseEntering);
+            sumOfAmount = donationCollectionService.sumCollectionsInGHSForWhoseEntering(whoseEntering, id);
             return new ResponseData("00", String.valueOf(Math.round(sumOfAmount)));
         } catch (Exception e) {
             logger.error("Exception:: " + e.getMessage());
@@ -363,7 +365,7 @@ public class ResourcesClasses {
 
     @PostMapping("/add-donation-details")
     public ResponseData addDonationDetails(@RequestParam("poster") MultipartFile imageFile,
-            @RequestParam("nameD") String nameD, @RequestParam("purpose") String purpose) {
+            @RequestParam("nameD") String nameD, @RequestParam("purpose") String purpose, @RequestParam("location") String location) {
 
         if (imageFile.isEmpty()) {
             return new ResponseData("06", "Failed to upload. Please select a file.");
@@ -382,6 +384,7 @@ public class ResourcesClasses {
                 donationDetails.setName(nameD);
                 donationDetails.setPicLocation(urlToSave);
                 donationDetails.setPurpose(purpose);
+                donationDetails.setLocation(location);
 
                 String respMsg = donationDetailsService.saveDonationDetails(donationDetails);
 

@@ -32,25 +32,37 @@ public class DonationCollectionService {
     @Value("${SMS.URL}")
     private String smsURL;
 
-    public List<DonationCollection> findAll() {
+    public List<DonationCollection> findAllByDonationDetails(Long id) {
+        logger.info("ID:: " + id);
+        List<DonationCollection> donationCollectionsList = null;
+        DonationDetails donationDetails = donationDetailsRepository.findById(id).orElse(null);
+        if (donationDetails != null) {
+            donationCollectionsList = donationCollectionRepository
+                    .findAllByDonationDetails(donationDetails);
+        }
 
-        List<DonationCollection> donationCollectionsList = donationCollectionRepository.findAll();
-
-        // for (DonationCollection donationCollection : donationCollectionsList) {
-        //     donationCollection.getDonationDetails().isEnabled();
-        // }
-
+        @SuppressWarnings("null")
         List<DonationCollection> filteredList = donationCollectionsList.stream()
                 .filter(dc -> hasEnabledDetails(dc))
                 .collect(Collectors.toList());
-                
+
         return filteredList;
     }
 
-    public List<DonationCollection> getAllDonationCollectionsWithEnabledDetails(String user) {
-        List<DonationCollection> donationCollectionsList = donationCollectionRepository.findAllByWhoIsEntering(user);
+    public List<DonationCollection> getAllDonationCollectionsWithEnabledDetails(String user, Long id) {
+        List<DonationCollection> donationCollectionsList = null;
+        DonationDetails donationDetails = donationDetailsRepository.findById(id).orElse(null);
+
+        if (donationDetails != null) {
+            donationCollectionsList = donationCollectionRepository
+                    .findAllByWhoIsEnteringAndDonationDetails(user, donationDetails);
+        }
+        // List<DonationCollection> donationCollectionsList =
+        // donationCollectionRepository
+        // .findAllByWhoIsEnteringAndDonationDetails(user, id);
 
         // Filter donationCollectionsList to include only those with enabled details
+        @SuppressWarnings("null")
         List<DonationCollection> filteredList = donationCollectionsList.stream()
                 .filter(dc -> hasEnabledDetails(dc))
                 .collect(Collectors.toList());
@@ -70,8 +82,16 @@ public class DonationCollectionService {
         return false; // No enabled details found
     }
 
-    public List<DonationCollection> findAllByUser(String user) {
-        return donationCollectionRepository.findAllByWhoIsEntering(user);
+    public List<DonationCollection> findAllByUser(String user, Long id) {
+
+        List<DonationCollection> donationCollectionsList = null;
+        DonationDetails donationDetails = donationDetailsRepository.findById(id).orElse(null);
+
+        if (donationDetails != null) {
+            donationCollectionsList = donationCollectionRepository
+                    .findAllByWhoIsEnteringAndDonationDetails(user, donationDetails);
+        }
+        return donationCollectionsList;
     }
 
     public Optional<DonationCollection> findByReceipt(String ticketNumber) {
@@ -223,14 +243,14 @@ public class DonationCollectionService {
         return value;
     }
 
-    public double sumCollectionsByCurrency(String currency) {
+    public double sumCollectionsByCurrency(String currency, Long id) {
 
         double sum = 0;
 
         try {
 
-            sum = donationCollectionRepository.sumAmountByCurrency(currency) != null
-                    ? Double.parseDouble(donationCollectionRepository.sumAmountByCurrency(currency))
+            sum = donationCollectionRepository.sumAmountByCurrency(currency, id) != null
+                    ? Double.parseDouble(donationCollectionRepository.sumAmountByCurrency(currency, id))
                     : 0.0;
 
         } catch (Exception e) {
@@ -240,14 +260,14 @@ public class DonationCollectionService {
         return sum;
     }
 
-    public double sumCollectionsByCurrencyAndDetailsId(String currency) {
+    public double sumCollectionsByCurrencyAndDetailsId(String currency, Long donateeId) {
 
         double sum = 0;
 
         try {
-            sum = donationCollectionRepository.sumAmountByCurrencyAndDetails(currency) != null
+            sum = donationCollectionRepository.sumAmountByCurrencyAndDetails(currency, donateeId) != null
                     ? Double.parseDouble(
-                            donationCollectionRepository.sumAmountByCurrencyAndDetails(currency))
+                            donationCollectionRepository.sumAmountByCurrencyAndDetails(currency, donateeId))
                     : 0.0;
 
         } catch (Exception e) {
@@ -257,15 +277,15 @@ public class DonationCollectionService {
         return sum;
     }
 
-    public double sumCollectionsInGHSForWhoseEntering(String whoseEntering) {
+    public double sumCollectionsInGHSForWhoseEntering(String whoseEntering, Long id) {
 
         double sum = 0;
 
         try {
 
-            sum = donationCollectionRepository.sumAmountInGHSForWhoseEntering(whoseEntering, "GHS") != null
+            sum = donationCollectionRepository.sumAmountInGHSForWhoseEntering(whoseEntering, "GHS", id) != null
                     ? Double.parseDouble(
-                            donationCollectionRepository.sumAmountInGHSForWhoseEntering(whoseEntering, "GHS"))
+                            donationCollectionRepository.sumAmountInGHSForWhoseEntering(whoseEntering, "GHS", id))
                     : 0.0;
 
         } catch (Exception e) {
@@ -275,11 +295,11 @@ public class DonationCollectionService {
         return sum;
     }
 
-    public String countCollections() {
+    public String countCollections(Long id) {
         long totalNoOfCollections = 0;
 
         try {
-            totalNoOfCollections = donationCollectionRepository.count();
+            totalNoOfCollections = donationCollectionRepository.count(id);
             // logger.info("NO OF USERS:: " + totalNoOfCollections);
         } catch (Exception e) {
             logger.error("Exception has occurred, " + e.getMessage());

@@ -158,7 +158,7 @@
 
 
 										<div class="modal-footer">
-											<button id="btnAdd" type="submit" onclick="addUser(this)"
+											<button id="btnAdd" type="submit" onclick="addUser(event)"
 												class="btn btn-primary ">Add User</button>
 											<button type="button" class="btn btn-default waves-effect"
 												data-bs-dismiss="modal">Close</button>
@@ -224,7 +224,17 @@
 													</div>
 												</div>
 											</div>
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="location" class="control-label">
+															Location</label>
+														<input type="text" class="form-control" name="location"
+															id="location">
+													</div>
+												</div>
 
+											</div>
 
 										</div>
 
@@ -299,7 +309,17 @@
 													</div>
 												</div>
 											</div>
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="locationEdit" class="control-label">
+															Location</label>
+														<input type="text" class="form-control" name="locationEdit"
+															id="locationEdit">
+													</div>
+												</div>
 
+											</div>
 
 										</div>
 
@@ -398,6 +418,7 @@
 												<th>Donatee Name</th>
 												<th>Pic Location</th>
 												<th>Purpose</th>
+												<th>location</th>
 												<th>Status</th>
 												<th>Action</th>
 											</tr>
@@ -458,6 +479,9 @@
 	<!-- <script th:src="@{https://cdn.jsdelivr.net/npm/modernizr@3.13.0/lib/cli.min.js}"></script> -->
 
 	<script>
+
+		var donationDetailsId = localStorage.getItem('donationDetailsId');
+
 		getDonateDetailsList();
 
 		function getDonateDetailsList() {
@@ -518,7 +542,9 @@
 										{
 											"data": "purpose"
 										},
-
+										{
+											"data": "location"
+										},
 
 										{
 											"data": "enabled"
@@ -586,7 +612,10 @@
 
 	<script type="text/javascript">
 		function addUser(e) {
-			// e.preventDefault(); 
+			e.preventDefault();
+			if (e && e.preventDefault()) {
+				e.preventDefault(); // Prevent the form from submitting
+			}
 			$("#loading").show();
 
 			var firstName = $("#firstName").val();
@@ -710,6 +739,11 @@
 		$(document).ready(function () {
 			$("#add-donation-form").submit(function (e) {
 
+				e.preventDefault();
+				if (e && e.preventDefault()) {
+					e.preventDefault(); // Prevent the form from submitting
+				}
+
 				$("#loading").show();
 				// const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 				var formData = new FormData(this);
@@ -794,7 +828,7 @@
 			$("#loading").show();
 
 			$.ajax({
-				'url': "[[@{/nib/api/total-collections}]]",
+				'url': "[[@{/nib/api/total-collections/}]]" + donationDetailsId,
 
 				'method': "GET",
 
@@ -830,7 +864,7 @@
 			$("#loading").show();
 
 			$.ajax({
-				'url': "[[@{/nib/api/total-amount/USD}]]",
+				'url': "[[@{/nib/api/total-amount/USD/}]]" + donationDetailsId,
 
 				'method': "GET",
 
@@ -863,7 +897,7 @@
 			$("#loading").show();
 
 			$.ajax({
-				'url': "[[@{/nib/api/total-amount/GHS}]]",
+				'url': "[[@{/nib/api/total-amount/GHS/}]]" + donationDetailsId,
 
 				'method': "GET",
 
@@ -939,6 +973,7 @@
 			var donateeName = $(row).find('td:eq(2)').text();
 			var picLocation = $(row).find('td:eq(3)').text();
 			var purpose = $(row).find('td:eq(4)').text();
+			var location = $(row).find('td:eq(5)').text();
 
 			console.log("ID EDIT:: " + id)
 
@@ -946,6 +981,7 @@
 			$('#nameDEdit').val(donateeName); // Assuming input field has ID 'editFirstName'
 			$('#posterEdit').val(picLocation);
 			$('#purposeEdit').val(purpose);
+			$('#locationEdit').val(location);
 
 			// Open the modal
 			$('#edit-donation-modal').modal('show');

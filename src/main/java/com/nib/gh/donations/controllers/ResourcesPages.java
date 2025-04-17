@@ -46,6 +46,13 @@ public class ResourcesPages {
       return "details"; // View name
    }
 
+   @GetMapping("/donatee")
+   public String donateePage(Model model, Authentication authentication) {
+      String username = authentication.getName();
+      model.addAttribute("username", username);
+      return "donatee"; // View name
+   }
+
    @GetMapping("/esb/fundstransfer")
    public String fundTransfer(Model model, Authentication authentication) {
       String username = authentication.getName();

@@ -44,7 +44,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 // response.sendRedirect(request.getContextPath() + "/nia/verification");
                 response.sendRedirect(request.getContextPath() + "/admin");
             } else {
-                response.sendRedirect(request.getContextPath()  + "/collection");
+                response.sendRedirect(request.getContextPath()  + "/donatee");
             }
         }
 

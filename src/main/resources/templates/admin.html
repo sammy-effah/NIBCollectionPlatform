@@ -158,7 +158,7 @@
 
 
 										<div class="modal-footer">
-											<button id="btnAdd" type="submit" onclick="addUser(this)"
+											<button id="btnAdd" type="submit" onclick="addUser(event)"
 												class="btn btn-primary ">Add User</button>
 											<button type="button" class="btn btn-default waves-effect"
 												data-bs-dismiss="modal">Close</button>
@@ -224,7 +224,17 @@
 													</div>
 												</div>
 											</div>
+											<div class="row">
+												<div class="col-md-12">
+													<div class="mb-3">
+														<label for="location" class="control-label">
+															Location</label>
+														<input type="text" class="form-control" name="location"
+															id="location">
+													</div>
+												</div>
 
+											</div>
 
 										</div>
 
@@ -342,7 +352,7 @@
 
 						<li><a href="#">NIB Collection</a>|</li>
 						<li><a th:href="@{details}">Donation Details</a>|</li>
-						<li><a th:href="@{collection}">Collection</a>|</li>
+						<li><a th:href="@{donatee}">Collection</a>|</li>
 						<li class="active">Users</li>
 					</ol>
 				</div>
@@ -476,6 +486,10 @@
 	<!-- <script th:src="@{https://cdn.jsdelivr.net/npm/modernizr@3.13.0/lib/cli.min.js}"></script> -->
 
 	<script>
+
+		var donationDetailsId = localStorage.getItem('donationDetailsId');
+		console.log("Donation Details ID::: " + donationDetailsId);
+
 		getUserList();
 
 		function getUserList() {
@@ -617,7 +631,10 @@
 
 	<script type="text/javascript">
 		function addUser(e) {
-			// e.preventDefault(); 
+			e.preventDefault();
+			if (e && e.preventDefault()) {
+				e.preventDefault(); // Prevent the form from submitting
+			}
 			$("#loading").show();
 
 			var firstName = $("#firstName").val();
@@ -821,7 +838,7 @@
 			$("#loading").show();
 
 			$.ajax({
-				'url': "[[@{/nib/api/total-collections}]]",
+				'url': "[[@{/nib/api/total-collections/}]]" + donationDetailsId,
 
 				'method': "GET",
 
@@ -857,7 +874,7 @@
 			$("#loading").show();
 
 			$.ajax({
-				'url': "[[@{/nib/api/total-amount/USD}]]",
+				'url': "[[@{/nib/api/total-amount/USD/}]]" + donationDetailsId,
 
 				'method': "GET",
 
@@ -890,7 +907,7 @@
 			$("#loading").show();
 
 			$.ajax({
-				'url': "[[@{/nib/api/total-amount/GHS}]]",
+				'url': "[[@{/nib/api/total-amount/GHS/}]]" + donationDetailsId,
 
 				'method': "GET",
 
