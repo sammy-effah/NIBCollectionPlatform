@@ -10,7 +10,7 @@ COPY .mvn .mvn
 COPY pom.xml .
 
 # Download dependencies (this caches dependencies if pom.xml hasn't changed)
-RUN ./mvnw dependency:go-offline
+#RUN ./mvnw dependency:go-offline
 
 # Copy the source code and build the package
 COPY src src
