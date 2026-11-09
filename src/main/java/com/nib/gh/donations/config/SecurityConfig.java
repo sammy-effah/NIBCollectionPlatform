@@ -1,15 +1,22 @@
 package com.nib.gh.donations.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.ldap.authentication.ad.ActiveDirectoryLdapAuthenticationProvider;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.boot.web.server.Ssl;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 @EnableWebSecurity
@@ -21,8 +28,10 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 http
-                                .csrf().disable()
-                                .requiresChannel(channel -> channel.anyRequest().requiresSecure()) // Enforces HTTPS
+                               
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .httpBasic(AbstractHttpConfigurer::disable)
+                                .requiresChannel(ch -> ch.anyRequest().requiresSecure())
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/nib/api/nia/*").authenticated()
                                                 .anyRequest().authenticated())
@@ -49,22 +58,43 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        @Bean
-        public ActiveDirectoryLdapAuthenticationProvider ldapAuthenticationProvider() {
-                ActiveDirectoryLdapAuthenticationProvider provider = new ActiveDirectoryLdapAuthenticationProvider(
-                                "nib-ghana.com", "ldap://172.17.250.26:389");
-                provider.setConvertSubErrorCodesToExceptions(true);
-                provider.setUseAuthenticationRequestCredentials(true);
-                return provider;
+       
+         @Bean
+        public AuthenticationManager authManager() {
+                return new ProviderManager(List.of(new CustomLdapAuthProvider()));
         }
+
+        // ========= LDAP Context Source =========
+        @Bean
+        public LdapContextSource contextSource() {
+                LdapContextSource contextSource = new LdapContextSource();
+                contextSource.setUrl("ldap://NIBWS22ADC:389");
+                contextSource.setBase("dc=nib,dc=com,dc=gh");
+                contextSource.setReferral("ignore");
+                contextSource.afterPropertiesSet();
+                return contextSource;
+        }
+
+        @Bean
+        public LdapTemplate ldapTemplate(LdapContextSource contextSource) {
+                return new LdapTemplate(contextSource);
+        }
+
+        // ========= PasswordEncoder =========
+        @Bean
+        @SuppressWarnings("deprecation")
+        public PasswordEncoder passwordEncoder() {
+                return NoOpPasswordEncoder.getInstance();
+        }
+
 
         @Bean
         public WebServerFactoryCustomizer<TomcatServletWebServerFactory> sslCustomizer() {
                 return factory -> {
                         Ssl ssl = new Ssl();
-                        ssl.setKeyStore("cfg/keystore.jks"); // Path to the keystore file
-                        ssl.setKeyStorePassword("172.17.1.8P@ssw0rd"); // Keystore password
-                        ssl.setKeyAlias("1.8cert"); // Key alias in the keystore
+                        ssl.setKeyStore("cfg/nib_crt.p12"); // Path to the keystore file
+                        ssl.setKeyStorePassword("NIBCrT@12KEY"); // Keystore password
+                        ssl.setKeyAlias("nib_crt"); // Key alias in the keystore
                         factory.setSsl(ssl);
                         factory.setPort(9900); // HTTPS port
                 };

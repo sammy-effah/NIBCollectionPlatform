@@ -28,8 +28,22 @@
 
 <body class="fixed-left">
 
+	<div style="
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    z-index: 0;
+    opacity: 0.57;
+    font-size: 35vw;  /* Responsive size based on viewport width */
+    color: #4169E1;
+    pointer-events: none;
+    line-height: 1;
+">
+    <i class='fas fa-solid fa-hand-holding-dollar'></i>
+</div>
+
 	<!-- Begin page -->
-	<div id="wrapper" style="padding-top: 1.1%;" class="container">
+	<div id="wrapper" style="padding-top: 1.1%;" class="container-fluid">
 
 		<div th:insert="~{fragments/header :: banner}"></div>
 
@@ -43,7 +57,7 @@
 		<div class="content-page">
 			<!-- Start content -->
 			<div class="content">
-				<div class="container">
+				<div class="container-fluid">
 
 					<!-- Page-Title -->
 					<div class="row">
@@ -215,10 +229,10 @@
 														</label> <select class="form-select" id="purpose"
 															name="purpose">
 															<option>Select Purpose</option>
-															<option value="Funeral">Funeral</option>
-															<option value="One Week Observation">One Week Observation
+															<option value="Funeral Of">Funeral</option>
+															<option value="One Week Observation Of">One Week Observation
 															</option>
-															<option value="Ordination">Ordination</option>
+															<option value="Ordination Of">Ordination</option>
 															<option value="Others">Others</option>
 														</select>
 													</div>
@@ -560,24 +574,23 @@
 
 										{
 											"targets": -1,
-											// "data": "enabled",
 											"defaultContent": "",
 											"render": function (data, type, row) {
 
 												if (data.enabled === true) {
-													return "<button class='btn btn-warning btn-sm warning' style='background-color:#ffA500' onclick='triggerDisableDialogue(this)'>" +
+													return "<div class='d-flex gap-2'><button class='btn btn-warning btn-sm warning' style='background-color:#ffA500' onclick='triggerDisableDialogue(this)'>" +
 														"<span style='color:#ffffff'>Disable</span></button>" +
 														"<button class='btn btn-default btn-sm save' style='background-color:#00008b' onclick='triggerEditModal(this)'>" +
 														"<span style='color:#ffffff'>Edit</span></button>" +
 														"<button class='btn btn-default btn-sm save' style='background-color:#f44336' onclick='triggerDeleteDialogue(this)'>" +
-														"<span style='color:#ffffff'>Delete</span></button>";
+														"<span style='color:#ffffff'>Delete</span></button></div>";
 												} else {
-													return "<button class='btn btn-default btn-sm update' style='background-color:#5eba7d' onclick='triggerEnableDialogue(this)'>" +
+													return "<div class='d-flex gap-2'><button class='btn btn-default btn-sm update' style='background-color:#5eba7d' onclick='triggerEnableDialogue(this)'>" +
 														"<span style='color:#ffffff'>Enable</span></button>" +
 														"<button class='btn btn-default btn-sm save' style='background-color:#00008b' onclick='triggerEditModal(this)'>" +
 														"<span style='color:#ffffff'>Edit</span></button>" +
 														"<button class='btn btn-default btn-sm save' style='background-color:#f44336' onclick='triggerDeleteDialogue(this)'>" +
-														"<span style='color:#ffffff'>Delete</span></button>";
+														"<span style='color:#ffffff'>Delete</span></button></div>";
 												}
 
 											}

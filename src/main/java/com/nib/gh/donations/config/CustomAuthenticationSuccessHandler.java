@@ -13,19 +13,6 @@ import java.io.IOException;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    // private static final Logger logger = LogManager.getLogger(CustomAuthenticationSuccessHandler.class);
-
-    // @Override
-    // public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-    //         Authentication authentication) throws IOException, ServletException {
-    //     Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-    //     logger.info("ROLES:: " + roles);
-    //     if (roles.contains("ROLE_ADMIN")) {
-    //         response.sendRedirect(request.getContextPath() + "/admin");
-    //     } else if (roles.contains("ROLE_USER")) {
-    //         response.sendRedirect(request.getContextPath()  + "/collection");
-    //     }
-    // }
 
     @Autowired
     private UserRepository userRepository;
@@ -34,17 +21,16 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
 
-        if (!userRepository.existsByUsernameAndEnabled(authentication.getName(), true)) {
+        if (!userRepository.existsByUsernameAndEnabled(authentication.getName().split("@")[0], true)) {
             throw new UsernameNotFoundException("User not found in the database");
         } else {
-            // Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-
-            // logger.info("ROLES:: " + roles);
-            if (userRepository.hasAdminRole(authentication.getName())) {
-                // response.sendRedirect(request.getContextPath() + "/nia/verification");
+            // hasInstitutionRole
+            if (userRepository.hasAdminRole(authentication.getName().split("@")[0])) {
                 response.sendRedirect(request.getContextPath() + "/admin");
+            } else if (userRepository.hasInstitutionRole(authentication.getName().split("@")[0])) {
+                response.sendRedirect(request.getContextPath() + "/institutions");
             } else {
-                response.sendRedirect(request.getContextPath()  + "/donatee");
+                response.sendRedirect(request.getContextPath() + "/donatee");
             }
         }
 

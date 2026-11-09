@@ -3,19 +3,26 @@ package com.nib.gh.donations.services;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import com.nib.gh.donations.model.CollectionDTO;
 import com.nib.gh.donations.model.DonationCollection;
 import com.nib.gh.donations.model.DonationDetails;
 import com.nib.gh.donations.repository.DonationCollectionRepository;
 import com.nib.gh.donations.repository.DonationDetailsRepository;
 import com.nib.gh.donations.utility.DoRequest;
+
 import java.util.stream.Collectors;
+
+// import com.nib.gh.donations.utility.DoRequestSMS;
+
 import jakarta.transaction.Transactional;
 
 @Service
@@ -31,6 +38,15 @@ public class DonationCollectionService {
 
     @Value("${SMS.URL}")
     private String smsURL;
+
+    // @Value("${SMS.API_KEY}")
+    // private String smsAPIKey;
+
+    // @Value("${SMS.SENDER_ID}")
+    // private String smsSenderId;
+
+    // @Value("${SMS.ACTION}")
+    // private String smsAction;
 
     public List<DonationCollection> findAllByDonationDetails(Long id) {
         logger.info("ID:: " + id);
@@ -153,14 +169,14 @@ public class DonationCollectionService {
                     String fundsDonated = Double.compare(collectionDTO.getAmount(), 0.0) == 0 ? ""
                             : collectionDTO.getCurrency()
                                     + collectionDTO.getAmount();
-                    String otherItemsAdded = collectionDTO.getItemsAndQuantity() != null
+                    String otherItemsAdded = collectionDTO.getItemsAndQuantity() != null || collectionDTO.getItemsAndQuantity() != ""
                             ? (!fundsDonated.isEmpty() ? " and " + collectionDTO.getItemsAndQuantity()
                                     : "" + collectionDTO.getItemsAndQuantity())
                             : "";
                     // sending sms
                     String textMsg = URLEncoder.encode("Dear " + collectionDTO.getContributorName()
                             + ", thank you for donating " + fundsDonated + otherItemsAdded + "  towards the "
-                            + donationDetails.getPurpose() + " of "
+                            + donationDetails.getPurpose()
                             + donationDetails.getName(), "UTF-8");
                     logger.info("TEXT MESSAGE:: " + textMsg);
                     String urlForSMS = String.format(smsURL.replace("#MSG_ID#", getMsgId(8))
@@ -168,6 +184,13 @@ public class DonationCollectionService {
                             .replace("#TEXT#", "%s"), textMsg);
                     logger.info("SMS URL SENT: " + urlForSMS);
                     new DoRequest().sendGet(urlForSMS);
+
+
+                    // new DoRequestSMS().sendGet(smsURL + "?action=" + smsAction
+                    //         + "&api_key=" + smsAPIKey + "&to="
+                    //         + ("233" + collectionDTO.getPhone().substring(1))
+                    //         + "&from=" + smsSenderId
+                    //         + "&sms=" + textMsg);
 
                     respMsg = "00#Successful";
                 } else {
@@ -261,20 +284,14 @@ public class DonationCollectionService {
     }
 
     public double sumCollectionsByCurrencyAndDetailsId(String currency, Long donateeId) {
-
-        double sum = 0;
-
         try {
-            sum = donationCollectionRepository.sumAmountByCurrencyAndDetails(currency, donateeId) != null
-                    ? Double.parseDouble(
-                            donationCollectionRepository.sumAmountByCurrencyAndDetails(currency, donateeId))
-                    : 0.0;
-
+            BigDecimal sum = donationCollectionRepository.sumAmountByCurrencyAndDetails(currency, donateeId);
+            logger.info("SUM:: " + sum);
+            return sum != null ? sum.doubleValue() : 0.0;
         } catch (Exception e) {
             logger.error("Exception occurred " + e.getMessage());
+            return 0.0;
         }
-
-        return sum;
     }
 
     public double sumCollectionsInGHSForWhoseEntering(String whoseEntering, Long id) {
@@ -313,4 +330,5 @@ public class DonationCollectionService {
         return collectionDTO.getContributorName() != null &&
                 collectionDTO.getPhone() != null;
     }
+
 }

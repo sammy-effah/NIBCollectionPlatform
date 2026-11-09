@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.nib.gh.donations.model.DonationDetails;
 import com.nib.gh.donations.model.DonationDetailsObj;
-import com.nib.gh.donations.model.UserDTO;
-import com.nib.gh.donations.model.Users;
 import com.nib.gh.donations.repository.DonationDetailsRepository;
 
 @Service

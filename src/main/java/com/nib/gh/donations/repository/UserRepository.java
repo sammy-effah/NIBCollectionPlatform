@@ -14,6 +14,9 @@ import jakarta.transaction.Transactional;
 public interface UserRepository extends JpaRepository<Users, Long> {
     Optional<Users> findByUsername(String username);
 
+    Optional<Users> findByEmail(String email);
+
+
     long count();
 
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN TRUE ELSE FALSE END " +
@@ -24,6 +27,11 @@ public interface UserRepository extends JpaRepository<Users, Long> {
            "FROM Users u JOIN u.roles r " +
            "WHERE u.username = :username AND r.name = 'ADMIN'")
     boolean hasAdminRole(@Param("username") String username);
+
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN TRUE ELSE FALSE END " +
+           "FROM Users u JOIN u.roles r " +
+           "WHERE u.username = :username AND r.name = 'INSTITUTION'")
+    boolean hasInstitutionRole(@Param("username") String username);
 
     @Modifying
     @Transactional

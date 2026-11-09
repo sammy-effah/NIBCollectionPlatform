@@ -9,12 +9,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 import com.nib.gh.donations.model.Role;
 import com.nib.gh.donations.model.Users;
 import com.nib.gh.donations.repository.UserRepository;
 
-@Service
+// @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
     private static final Logger logger = LogManager.getLogger(CustomUserDetailsService.class);

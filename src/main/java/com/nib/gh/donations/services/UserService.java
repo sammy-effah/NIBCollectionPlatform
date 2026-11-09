@@ -44,6 +44,13 @@ public class UserService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         try {
+
+            Optional<Users> existingUser = userRepository.findByEmail(user.getEmail());
+            Optional<Users> existingUserUsername = userRepository.findByUsername(user.getUsername());
+            if (existingUser.isPresent() || existingUserUsername.isPresent()) {
+                return "06#Failed, User already exists";
+            }
+
             logger.info("USER DTO:: " + user);
             if (user.getEmail() != null && user.getPhoneNumber() != null && user.getUsername() != null) {
 

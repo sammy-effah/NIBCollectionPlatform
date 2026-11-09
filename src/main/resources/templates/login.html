@@ -16,88 +16,81 @@
 
 </head>
 
-<body>
-
+<body style="position: relative; min-height: 100vh; background-color: #f8f9fa;">
+<div style="
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    z-index: 0;
+    opacity: 0.57;
+    font-size: 35vw;  /* Responsive size based on viewport width */
+    color: #4169E1;
+    pointer-events: none;
+    line-height: 1;
+">
+    <i class='fas fa-solid fa-hand-holding-dollar'></i>
+</div>
     <div class="container" style="padding-top: 5%;">
 
         <div class="row">
             <div class="col-md-4 mx-auto">
-                <div class="panel panel-default">
-                    <div class="card">
-                        <span style="text-align: center;">
-                            <img width="90" height="80" 
-                                    th:src="@{https://iili.io/dk9VxEl.jpg}" />
-                                </span>       
-                            <h3 class="card-title"
-                                style="text-align: center; height: 40px;color: whitesmoke; background-color: #4169E1;">
-                                <span style="margin-top: 29px; font-size: large;">  NIB Donation Collection </span>
-                            </h3>
-                        <div class=" card-body">
-                            <form th:object="${credentials}" th:action="@{login}" method="post">
+             <div class="panel panel-default" style="max-width: 1100px; margin: 40px auto; padding: 30px; font-size: 1.2rem;">
 
-                                <div class="mb-3">
-                                    <div class="row">
-                                        <div class="col-sm-10">
-                                            <div class="input-group mb-3"
-                                                th:classappend="${#fields.hasErrors('username')}? 'has-error':''">
-                                                <input type="text" class="form-control input-lg" id="username"
-                                                    name="username" th:field="*{username}" autofocus="autofocus"
-                                                    placeholder="Username" required />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <div class="row">
-                                            <div class="col-sm-10">
-                                                <div class="input-group mb-3"
-                                                    th:classappend="${#fields.hasErrors('password')}? 'has-error':''">
+    <div class="card" style="padding: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.1); border-radius: 10px; width: 500px;" >
 
-                                                    <input type="password" id="password" name="password"
-                                                        class="form-control input-lg" th:field="*{password}"
-                                                        placeholder="Password" required />
-                                                        <button type="button" id="togglePassword" class="btn btn-md btn btn-block">Show</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <div class="row">
-                                            <div class="col-sm-8">
-                                                <button class="btn btn-md btn-primary btn-block"
-                                                    name="Submit" value="Login" type="Submit" th:text="Login">Log In
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div style="color:red" th:if="${param.error}">
-                                        Validation error
-                                    </div>
-                                    <div th:if="${param.logout}">
-                                        You have been logged out.
-                                    </div>
-                                    <div class="error" th:if="${param.sessionExpired == true}">
-                                    Session Expired! Please login again.
-                                    </div>
- 
-                                   
-                            </form>
-                            <div class="form-group m-t-30">
-                                <div class="row">
-                                    <div class="col-sm-7">
-                                        <!-- <a th:href="@{/recoverpw}"><i class="fa fa-lock m-r-5"></i>Forgot your
-                                            password?</a> -->
-                                    </div>
-                                    
-                                    <div class="col-sm-4">
-                                        <!-- <a th:href="@{/resetpw}"><i class="fa fa-lock m-r-5"></i>Reset password</a> -->
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        </div>
+        <!-- Logo -->
+        <div class="text-center mb-3">
+            <img width="120" height="100" th:src="@{https://iili.io/dk9VxEl.jpg}" />
+        </div>
+
+        <!-- Title -->
+        <h2 class="card-title text-center text-white mb-4"
+            style="height: 60px; line-height: 60px; background-color: #4169E1; border-radius: 8px;">
+            NIB Offsite Cash Collection Portal 
+        </h2>
+
+        <!-- Form -->
+        <div class="card-body">
+            <form th:object="${credentials}" th:action="@{login}" method="post">
+
+                <!-- Username Field -->
+                <div class="mb-4">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control form-control-lg" id="username" name="username"
+                        th:field="*{username}" placeholder="Enter your username" required />
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" class="form-control form-control-lg"
+                            th:field="*{password}" placeholder="Enter your password" required />
+                        <button type="button" id="togglePassword" class="btn btn-secondary btn-lg">
+                           <i id="eyeIcon" class="fas fa-eye"></i>
+                        </button>
+
                     </div>
                 </div>
+
+                <!-- Login Button -->
+                <div class="mb-4">
+                    <button class="btn btn-primary btn-lg w-100" name="Submit" value="Login" type="submit" style="background-color: #4169E1 !important;">
+                        Log In
+                    </button>
+                </div>
+
+                <!-- Error messages -->
+                <div style="color:red" th:if="${param.error}">Validation error</div>
+                <div th:if="${param.logout}">You have been logged out.</div>
+                <div class="error" th:if="${param.sessionExpired == true}">
+                    Session Expired! Please login again.
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </div>

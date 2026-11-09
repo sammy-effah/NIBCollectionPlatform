@@ -41,7 +41,7 @@
 			<artifactId>hibernate-core</artifactId>
 			<version>6.1.6.Final</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
@@ -70,6 +70,12 @@
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
 			<version>12.3.0.jre17-preview</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.33</version>			<!-- You can check for the latest stable version -->
 		</dependency>
 
 		<dependency>
@@ -167,6 +173,12 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-ldap</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.directory.api</groupId>
+			<artifactId>api-all</artifactId>
+			<version>2.1.4</version>
 		</dependency>
 
 	</dependencies>

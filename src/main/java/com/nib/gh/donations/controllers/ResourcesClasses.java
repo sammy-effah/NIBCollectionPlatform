@@ -1,10 +1,12 @@
 package com.nib.gh.donations.controllers;
 
-import com.nib.gh.donations.esb.T_24_FundsTransfer;
-import com.nib.gh.donations.esbservice.T24FundsTransferService;
+// import com.nib.gh.donations.esb.T_24_FundsTransfer;
+// import com.nib.gh.donations.esbservice.T24FundsTransferService;
 import com.nib.gh.donations.model.*;
 import com.nib.gh.donations.services.DonationCollectionService;
 import com.nib.gh.donations.services.DonationDetailsService;
+import com.nib.gh.donations.services.InstitutionPayCollectionsService;
+import com.nib.gh.donations.services.InstitutionService;
 import com.nib.gh.donations.services.RoleService;
 import com.nib.gh.donations.services.UserService;
 import com.nib.gh.donations.utility.DoRequest;
@@ -46,10 +48,16 @@ public class ResourcesClasses {
     private DonationDetailsService donationDetailsService;
 
     @Autowired
-    private RoleService roleService;
+    private InstitutionService institutionService;
 
     @Autowired
-    private T24FundsTransferService t24FundsTransferService;
+    private InstitutionPayCollectionsService institutionPayCollectionsService;
+
+    @Autowired
+    private RoleService roleService;
+
+    // @Autowired
+    // private T24FundsTransferService t24FundsTransferService;
 
     @GetMapping("/get-data/{donationDetailsId}")
     // @ResponseBody
@@ -58,15 +66,38 @@ public class ResourcesClasses {
         return donationCollectionService.findAllByDonationDetails(id);
     }
 
+    @GetMapping("/get-payment-records/{institutionId}")
+    // @ResponseBody
+    public List<InstitutionPayCollections> getPaymentCollectionData(@PathVariable("institutionId") Long id) {
+        logger.info("DONATEE ID:: " + id);
+        return institutionPayCollectionsService.findAllByInstitutionAndCreateDate(id);
+    }
+
+
     @GetMapping("/get-data/{user}/{donationDetailsId}")
     // @ResponseBody
-    public List<DonationCollection> getCollectionDataByUser(@PathVariable("user") String user, @PathVariable("donationDetailsId") Long id) {
+    public List<DonationCollection> getCollectionDataByUser(@PathVariable("user") String user,
+            @PathVariable("donationDetailsId") Long id) {
         return donationCollectionService.findAllByUser(user, id);
     }
 
+    @GetMapping("/get-payment-records/{user}/{institutionId}")
+    // @ResponseBody
+    public List<InstitutionPayCollections> getPaymentCollectionDataByUser(@PathVariable("user") String user,
+            @PathVariable("institutionId") Long id) {
+        return institutionPayCollectionsService.findAllByUser(user, id);
+    }
+
     @GetMapping("/get-data/details-active/{user}/{donationDetailsId}")
-    public List<DonationCollection> getCollectionDataByUserAndDetailsEnabled(@PathVariable("user") String user, @PathVariable("donationDetailsId") Long id) {
+    public List<DonationCollection> getCollectionDataByUserAndDetailsEnabled(@PathVariable("user") String user,
+            @PathVariable("donationDetailsId") Long id) {
         return donationCollectionService.getAllDonationCollectionsWithEnabledDetails(user, id);
+    }
+
+    @GetMapping("/get-payment-records/institution/{user}/{institutionId}")
+    public List<InstitutionPayCollections> getCollectionDataByUserAndInstitutionEnabled(
+            @PathVariable("user") String user, @PathVariable("institutionId") Long id) {
+        return institutionPayCollectionsService.findAllByUserForToday(user, id);
     }
 
     @PostMapping("/add-data")
@@ -75,6 +106,48 @@ public class ResourcesClasses {
         try {
             if (collectionDTO != null) {
                 String respMsg = donationCollectionService.saveCollectionData(collectionDTO);
+                logger.info("RESPONSE:: " + respMsg);
+
+                // Assuming `respMsg.split("#")[0]` checks the status code
+                if (respMsg.split("#")[0].equals("00")) {
+
+                    return ResponseEntity.ok(new ResponseData("00", "Added Successfully"));
+
+                } else {
+                    return ResponseEntity.ok(new ResponseData("06", "Failed"));
+
+                }
+
+            } else {
+
+                return ResponseEntity.badRequest().body(new ResponseData("06", "Collection data is empty"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ResponseData("06", "Exception has occurred!"));
+
+        }
+
+    }
+
+    @PostMapping("/add-payment-record")
+    public ResponseEntity<?> addPaymentCollectionData(@RequestBody InstitutionPayObj collectionDTO) {
+        logger.info("REQUEST DATA:: " + collectionDTO);
+        try {
+            if (collectionDTO != null) {
+
+                InstitutionPayCollections institutionPayCollections = new InstitutionPayCollections();
+                institutionPayCollections.setPurpose(collectionDTO.getPurpose());
+                institutionPayCollections.setAmount(collectionDTO.getAmount());
+                institutionPayCollections.setEnteredBy(collectionDTO.getEnteredBy());
+                institutionPayCollections.setIndexNumber(collectionDTO.getIndexNumber());
+                institutionPayCollections.setInstitution(
+                        institutionService.findInstitutionById(Long.parseLong(collectionDTO.getInstitution())));
+                institutionPayCollections.setLevel(collectionDTO.getLevel());
+                institutionPayCollections.setVoucherNumber(collectionDTO.getVoucherNumber());
+                institutionPayCollections.setPhoneNumber(collectionDTO.getPhoneNumber());
+                institutionPayCollections.setName(collectionDTO.getName());
+
+                String respMsg = institutionPayCollectionsService.saveInstitutionPaymentData(institutionPayCollections);
                 logger.info("RESPONSE:: " + respMsg);
 
                 // Assuming `respMsg.split("#")[0]` checks the status code
@@ -109,6 +182,27 @@ public class ResourcesClasses {
             return new ResponseData("06", "Failed");
     }
 
+    @PutMapping("/update-payment-data")
+    public ResponseData updateDataByVoucher(@RequestBody InstitutionPayObj collectionDTO) {
+        logger.info("VOUCHER:: {}" + collectionDTO.getVoucherNumber());
+
+        InstitutionPayCollections institutionPayCollections = new InstitutionPayCollections();
+
+        institutionPayCollections.setName(collectionDTO.getName());
+        institutionPayCollections.setAmount(collectionDTO.getAmount());
+        institutionPayCollections.setIndexNumber(collectionDTO.getIndexNumber());
+        institutionPayCollections.setPhoneNumber(collectionDTO.getPhoneNumber());
+        institutionPayCollections.setLevel(collectionDTO.getLevel());
+        institutionPayCollections.setVoucherNumber(collectionDTO.getVoucherNumber());
+
+        String respMsg = institutionPayCollectionsService.updateCollectionData(institutionPayCollections);
+        logger.info("RESPONSE:: " + respMsg);
+        if (respMsg.split("#")[0].equals("00"))
+            return new ResponseData("00", "Added Successfully");
+        else
+            return new ResponseData("06", "Failed");
+    }
+
     @GetMapping("/get-data-by-ticket/{receipt_num}")
     public DonationCollection getCollectionDataByTicket(@PathVariable("receipt_num") String receiptNum) {
         logger.info("RECEIPT:: " + receiptNum);
@@ -119,10 +213,34 @@ public class ResourcesClasses {
         return donationCollection;
     }
 
+    @GetMapping("/get-data-by-voucher/{voucher}")
+    public InstitutionPayCollections getCollectionDataByVoucher(@PathVariable("voucher") String voucher) {
+        logger.info("VOUCHER:: " + voucher);
+        Optional<InstitutionPayCollections> optionalDonationCollection = institutionPayCollectionsService
+                .findByVoucher(voucher);
+        InstitutionPayCollections donationCollection = null;
+        if (optionalDonationCollection.isPresent())
+            donationCollection = optionalDonationCollection.get();
+        return donationCollection;
+    }
+
     @GetMapping("/remove-data/{receipt_num}")
     public ResponseData removeDataByTicket(@PathVariable("receipt_num") String receiptNum) {
         logger.info("RECEIPT:: " + receiptNum);
         boolean response = donationCollectionService.removeByReceipt(receiptNum);
+        logger.info("RESPONSE:: " + response);
+        if (response) {
+            return new ResponseData("00", "Reversed successfully");
+        } else {
+            return new ResponseData("06", "Reversal failed");
+        }
+
+    }
+
+    @GetMapping("/remove-payment-data/{voucher}")
+    public ResponseData removeDataByVoucher(@PathVariable("voucher") String voucher) {
+        logger.info("RECEIPT:: " + voucher);
+        boolean response = institutionPayCollectionsService.removeByVoucher(voucher);
         logger.info("RESPONSE:: " + response);
         if (response) {
             return new ResponseData("00", "Reversed successfully");
@@ -231,6 +349,24 @@ public class ResourcesClasses {
 
     }
 
+    @GetMapping("/total-collections-institution/{institutionId}")
+    public ResponseData countPaymentForInstitution(@PathVariable("institutionId") long institutionId) {
+
+        try {
+            String numOfCollection = institutionPayCollectionsService.countCollections(institutionId);
+            if (numOfCollection != null) {
+                return new ResponseData("00", numOfCollection);
+            } else {
+                return new ResponseData("06", null);
+            }
+
+        } catch (Exception e) {
+            logger.error("Exception, " + e.getMessage());
+            return new ResponseData("07", "0");
+        }
+
+    }
+
     @GetMapping("/get-donation-details/{donation_details_id}")
     public ResponseData donationDetailsById(@PathVariable("donation_details_id") long donation_details_id) {
         DonationDetails donationDetails;
@@ -278,7 +414,6 @@ public class ResourcesClasses {
             return new ResponseData("06", null);
         }
     }
-
 
     @GetMapping("/delete-donatee/{donate_details_id}")
     public ResponseData deleteDonateDetails(@PathVariable("donate_details_id") long id) {
@@ -338,13 +473,28 @@ public class ResourcesClasses {
     }
 
     @GetMapping("/total-amount/{currency}/{donationDetailsId}")
-    public ResponseData sumOfAmountInCurrency(@PathVariable("currency") String currency, @PathVariable("donationDetailsId") long id) {
+    public ResponseData sumOfAmountInCurrency(@PathVariable("currency") String currency,
+            @PathVariable("donationDetailsId") long id) {
         double sumOfAmount = 0;
         try {
 
             // sumOfAmount = donationCollectionService.sumCollectionsByCurrency(currency);
             sumOfAmount = donationCollectionService.sumCollectionsByCurrencyAndDetailsId(currency, id);
-            return new ResponseData("00", String.valueOf(Math.round(sumOfAmount)));
+            return new ResponseData("00", String.valueOf(sumOfAmount));
+        } catch (Exception e) {
+            logger.error("Exception:: " + e.getMessage());
+            return new ResponseData("06", "0");
+        }
+    }
+
+    @GetMapping("/total-amount-institution/{currency}/{institutionId}")
+    public ResponseData sumOfAmountInstitutionInCurrency(
+            @PathVariable("institutionId") long institutionId) {
+        double sumOfAmount = 0;
+        try {
+
+            sumOfAmount = institutionPayCollectionsService.sumCollectionsByInstitutionId(institutionId);
+            return new ResponseData("00", String.valueOf(sumOfAmount));
         } catch (Exception e) {
             logger.error("Exception:: " + e.getMessage());
             return new ResponseData("06", "0");
@@ -352,7 +502,8 @@ public class ResourcesClasses {
     }
 
     @GetMapping("/sum-amount/teller/{whoseEntering}/{donationDetailsId}")
-    public ResponseData sumOfAmountInGHSForWhoseEntering(@PathVariable("whoseEntering") String whoseEntering,  @PathVariable("donationDetailsId") long id) {
+    public ResponseData sumOfAmountInGHSForWhoseEntering(@PathVariable("whoseEntering") String whoseEntering,
+            @PathVariable("donationDetailsId") long id) {
         double sumOfAmount = 0;
         try {
             sumOfAmount = donationCollectionService.sumCollectionsInGHSForWhoseEntering(whoseEntering, id);
@@ -363,9 +514,24 @@ public class ResourcesClasses {
         }
     }
 
+    @GetMapping("/sum-amount-institution/teller/{enteredBy}/{institutionId}")
+    public ResponseData sumOfAmountInstitutionInGHSForWhoseEntering(@PathVariable("enteredBy") String enteredBy,
+            @PathVariable("institutionId") long institutionId) {
+        Double sumOfAmount = 0.0;
+        try {
+            sumOfAmount = institutionPayCollectionsService.sumCollectionsInGHSForWhoseEntering(enteredBy,
+                    institutionId);
+            return new ResponseData("00", String.valueOf(Math.round(sumOfAmount)));
+        } catch (Exception e) {
+            logger.error("Exception:: " + e.getMessage());
+            return new ResponseData("06", "0");
+        }
+    }
+
     @PostMapping("/add-donation-details")
     public ResponseData addDonationDetails(@RequestParam("poster") MultipartFile imageFile,
-            @RequestParam("nameD") String nameD, @RequestParam("purpose") String purpose, @RequestParam("location") String location) {
+            @RequestParam("nameD") String nameD, @RequestParam("purpose") String purpose,
+            @RequestParam("location") String location) {
 
         if (imageFile.isEmpty()) {
             return new ResponseData("06", "Failed to upload. Please select a file.");
@@ -402,31 +568,6 @@ public class ResourcesClasses {
         }
     }
 
-    @GetMapping("/esb/fundstransfer-data/all")
-    public List<T_24_FundsTransfer> getEsbFundstransferDataAll() {
-        List<T_24_FundsTransfer> t24FundsTransfer;
-        try {
-            t24FundsTransfer = t24FundsTransferService.findAll();
-            return t24FundsTransfer;
-        } catch (Exception e) {
-            logger.error("Exception:: " + e.getMessage());
-            return null;
-        }
-    }
-
-    @GetMapping("/esb/fundstransfer-data")
-    public List<T_24_FundsTransfer> getEsbFundstransferDataByDate(@RequestParam(value = "startDate") String startDate,
-            @RequestParam(value = "endDate") String endDate) {
-        List<T_24_FundsTransfer> t24FundsTransfer;
-        try {
-            t24FundsTransfer = t24FundsTransferService.findAll();
-            return t24FundsTransfer;
-        } catch (Exception e) {
-            logger.error("Exception:: " + e.getMessage());
-            return null;
-        }
-    }
-
     public static String encodeImage(byte[] imageBytes) throws IOException {
 
         String base64Image = Base64.getEncoder().encodeToString(imageBytes);
@@ -454,6 +595,99 @@ public class ResourcesClasses {
     public static void main(String[] args) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         System.out.println(passwordEncoder.encode("Passw0rdS@m|"));
+    }
+
+    @GetMapping("/get-institutions/{institution_id}")
+    public ResponseData institutionById(@PathVariable("institution_id") long institution_id) {
+        Institution institution;
+        try {
+            institution = institutionService.findInstitutionById(institution_id);
+            return new ResponseData("00", new JSONObject(institution).toString());
+        } catch (Exception e) {
+            logger.error("Exception:: " + e.getMessage());
+            return new ResponseData("06", "0");
+        }
+    }
+
+    @GetMapping("/get-institution-for-selection")
+    public ResponseData getInstitutionForSelect() {
+        List<Institution> institutions;
+        try {
+            institutions = institutionService.findNotMoreThanFourDays();
+            return new ResponseData("00", new JSONArray(institutions).toString());
+        } catch (Exception e) {
+            logger.error("Exception:: " + e.getMessage());
+            return new ResponseData("06", "0");
+        }
+    }
+
+    @GetMapping("/institutions/all")
+    public List<Institution> getAllInstitutions() {
+        List<Institution> institutions;
+        try {
+            institutions = institutionService.findAll();
+            return institutions;
+        } catch (Exception e) {
+            logger.error("Exception:: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @GetMapping("/institution/by-enabled")
+    public ResponseData getInstititutionsByEnabled() {
+        List<Institution> institutions;
+        try {
+            institutions = institutionService.findAllByEnabled();
+            return new ResponseData("00", new JSONArray(institutions).toString());
+        } catch (Exception e) {
+            logger.error("Exception:: " + e.getMessage());
+            return new ResponseData("06", null);
+        }
+    }
+
+    @GetMapping("/delete-institution/{institution_id}")
+    public ResponseData deleteInstitution(@PathVariable("institution_id") long id) {
+        logger.info("REQUESTED ID:: " + id);
+
+        if (institutionService.deleteById(id))
+            return new ResponseData("00", "Added successfully");
+        else
+            return new ResponseData("06", "Failed");
+
+    }
+
+    @GetMapping("/enable-institution/{institution_id}")
+    public ResponseData enableIns(@PathVariable("institution_id") long id) {
+        logger.info("REQUESTED ID:: " + id);
+
+        if (institutionService.enableById(id))
+            return new ResponseData("00", "Added successfully");
+        else
+            return new ResponseData("06", "Failed");
+
+    }
+
+    @GetMapping("/disable-institution/{institution_id}")
+    public ResponseData disableInstitution(@PathVariable("institution_id") long id) {
+        logger.info("REQUESTED ID:: " + id);
+
+        if (institutionService.disableById(id))
+            return new ResponseData("00", "Added successfully");
+        else
+            return new ResponseData("06", "Failed");
+
+    }
+
+    @PostMapping("/edit-institution")
+    public ResponseData editInstitution(@RequestBody DonationDetailsObj institution) {
+        logger.info("REQUEST:: " + institution);
+        String respMsg = institutionService.updateInstitution(institution);
+        logger.info("RESPONSE:: " + respMsg);
+        if (respMsg.split("#")[0].equals("00"))
+            return new ResponseData("00", "Updated successfully");
+        else
+            return new ResponseData("06", "Failed");
+
     }
 
 }

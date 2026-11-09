@@ -1,6 +1,7 @@
 package com.nib.gh.donations.repository;
 
 import java.util.Optional;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +19,8 @@ public interface DonationCollectionRepository extends JpaRepository<DonationColl
     List<DonationCollection> findAllByDonationDetails(DonationDetails donationDetails);
 
     List<DonationCollection> findAllByWhoIsEnteringAndDonationDetails(String whoIsEntering, DonationDetails donationDetails);
+
+    
     
     @Transactional
     Long deleteByReceiptNum(String receiptNum);
@@ -36,6 +39,6 @@ public interface DonationCollectionRepository extends JpaRepository<DonationColl
 
     @Query("SELECT SUM(dc.amount) FROM DonationCollection dc WHERE dc.currency = :currency AND EXISTS (SELECT 1 FROM dc.donationDetails dd WHERE dd.id = :donation_details_id)")
     // @Query("SELECT SUM(dc.amount) FROM DonationCollection dc WHERE dc.currency = :currency AND dc.donation_details_id = :donation_details_id")
-    String sumAmountByCurrencyAndDetails(@Param("currency") String currency, @Param("donation_details_id") Long donation_details_id);
+    BigDecimal sumAmountByCurrencyAndDetails(@Param("currency") String currency, @Param("donation_details_id") Long donation_details_id);
 
 }

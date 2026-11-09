@@ -9,7 +9,7 @@ h<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thyme
 	<meta name="description" content="" />
 	<meta name="author" content="" />
 	<link rel="icon" th:href="@{https://iili.io/dk9VxEl.jpg}" type="image/x-icon">
-	
+
 
 
 	<title th:replace="${title}">The awesome application</title>
@@ -23,8 +23,8 @@ h<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thyme
 	<link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css}" rel="stylesheet" />
 
 	<!-- Font Icons -->
-	<link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/fontawesome.min.css}"
-		rel="stylesheet" />
+	<link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css}" />
+
 	<link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/css/ionicons.min.css}" />
 	<link rel="stylesheet"
 		th:href="@{https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css}">
@@ -185,21 +185,20 @@ h<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thyme
 
 
 	<!-- Top Bar Start -->
-	<div th:fragment="banner">
+	<div th:fragment="banner" class="container-fluid">
 		<div class="topbar">
 			<!-- LOGO -->
 			<div class="topbar-left">
 				<div class="text-center">
 					<a th:href="@{collection}" class="logo"><i class="md md-terrain"></i>
-						<img
-							th:src="@{https://iili.io/dk9VxEl.jpg}" />
+						<img th:src="@{https://iili.io/dk9VxEl.jpg}" />
 						<!-- <span style="font-size: medium; color:beige; background-color: #2196F3;">NIB Collection</span></a> -->
 				</div>
 			</div>
 			<!-- Button mobile view to collapse sidebar menu -->
 
 			<div class="navbar navbar-default" role="navigation">
-				<div class="container">
+				<div class="container-fluid">
 					<div class="">
 						<ul class="nav navbar-nav navbar-right pull-right">
 
