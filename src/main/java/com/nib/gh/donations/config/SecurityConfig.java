@@ -88,15 +88,15 @@ public class SecurityConfig {
         }
 
 
-        @Bean
-        public WebServerFactoryCustomizer<TomcatServletWebServerFactory> sslCustomizer() {
-                return factory -> {
-                        Ssl ssl = new Ssl();
-                        ssl.setKeyStore("cfg/nib_crt.p12"); // Path to the keystore file
-                        ssl.setKeyStorePassword("NIBCrT@12KEY"); // Keystore password
-                        ssl.setKeyAlias("nib_crt"); // Key alias in the keystore
-                        factory.setSsl(ssl);
-                        factory.setPort(9900); // HTTPS port
-                };
-        }
+        // @Bean
+        // public WebServerFactoryCustomizer<TomcatServletWebServerFactory> sslCustomizer() {
+        //         return factory -> {
+        //                 Ssl ssl = new Ssl();
+        //                 ssl.setKeyStore("cfg/nib_crt.p12"); // Path to the keystore file
+        //                 ssl.setKeyStorePassword("NIBCrT@12KEY"); // Keystore password
+        //                 ssl.setKeyAlias("nib_crt"); // Key alias in the keystore
+        //                 factory.setSsl(ssl);
+        //                 factory.setPort(9900); // HTTPS port
+        //         };
+        // }
 }
