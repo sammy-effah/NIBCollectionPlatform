@@ -22,6 +22,9 @@ RUN ./mvnw package -DskipTests
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
+WORKDIR /app
+COPY cfg/ /app/cfg/
+COPY target/*.jar app.jar
 # Copy only the compiled fat JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
