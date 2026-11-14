@@ -176,9 +176,9 @@
 		</dependency>
 
 		<dependency>
-    <groupId>org.webjars.npm</groupId>
-    <artifactId>sweetalert2</artifactId>
-    <version>11.10.0</version>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>sweetalert2</artifactId>
+            <version>11.10.0</version>
         </dependency>
 
 		<dependency>
