@@ -133,7 +133,7 @@
 		<dependency>
 			<groupId>org.webjars.npm</groupId>
 			<artifactId>sweetalert2</artifactId>
-			<version>11.7.28</version>
+			<version>11.12.4</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
