@@ -25,8 +25,10 @@ WORKDIR /app
 # Copy only the compiled fat JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
+FROM eclipse-temurin:17-jre
+WORKDIR /app
 COPY cfg/ /app/cfg/
-COPY target/*.jar app.jar
+COPY --from=build /build/target/*.jar app.jar
 
 # Spring Boot default port (change if your application.properties uses a different port)
 EXPOSE 8080
