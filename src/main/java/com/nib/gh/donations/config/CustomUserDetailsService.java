@@ -1,6 +1,7 @@
-
 package com.nib.gh.donations.config;
 
+import java.util.Collections;
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -8,9 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -23,28 +21,37 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        String sql = "SELECT username, password, role FROM users WHERE username = ?";
-        
-        List> users = jdbcTemplate.queryForList(sql, username);
-        
-        if (users.isEmpty()) {
+        // Note: If your roles table is named "roles" (plural), change "role r" to "roles r"
+        String sql = """
+                SELECT u.username, u.password, u.enabled, r.name AS role_name
+                FROM users u
+                LEFT JOIN role r ON u.role_id = r.id
+                WHERE u.username = ?
+                """;
+
+        List<UserDetails> results = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            String dbUsername = rs.getString("username");
+            String dbPassword = rs.getString("password");
+            boolean enabled = rs.getBoolean("enabled");
+            String role = rs.getString("role_name");
+
+            if (role == null || role.isBlank()) {
+                role = "ROLE_USER";
+            } else if (!role.startsWith("ROLE_")) {
+                role = "ROLE_" + role;
+            }
+
+            return User.withUsername(dbUsername)
+                    .password(dbPassword)
+                    .disabled(!enabled)
+                    .authorities(Collections.singletonList(new SimpleGrantedAuthority(role)))
+                    .build();
+        }, username);
+
+        if (results.isEmpty()) {
             throw new UsernameNotFoundException("User not found: " + username);
         }
 
-        Map<String, Object> userRow = users.get(0);
-        String dbUsername = (String) userRow.get("username");
-        String dbPassword = (String) userRow.get("password");
-        String role = userRow.get("role") != null ? (String) userRow.get("role") : "ROLE_USER";
-
-        // Ensure role has the ROLE_ prefix required by Spring Security
-        if (!role.startsWith("ROLE_")) {
-            role = "ROLE_" + role;
-        }
-
-        return new User(
-                dbUsername,
-                dbPassword,
-                List.of(new SimpleGrantedAuthority(role))
-        );
+        return results.get(0);
     }
 }
