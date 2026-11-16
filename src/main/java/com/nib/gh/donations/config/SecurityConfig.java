@@ -27,39 +27,37 @@ public class SecurityConfig {
         @Autowired
         private CustomAuthenticationSuccessHandler authenticationSuccessHandler;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                http
-                               
-                                .csrf(AbstractHttpConfigurer::disable)
-                                .httpBasic(AbstractHttpConfigurer::disable)
-                                .requiresChannel(ch -> ch.anyRequest().requiresSecure())
-                                .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/nib/api/nia/*").authenticated()
-                                                .anyRequest().authenticated())
-                                .formLogin(formLogin -> formLogin
-                                                .loginPage("/login")
-                                                .permitAll()
-                                                .successHandler(authenticationSuccessHandler))
-                                .logout(logout -> logout
-                                                .logoutUrl("/logout")
-                                                .logoutSuccessUrl("/login?logout")
-                                                .invalidateHttpSession(true)
-                                                .deleteCookies("JSESSIONID")
-                                                .permitAll())
-                                .sessionManagement(sessionManagement -> sessionManagement
-                                                .invalidSessionUrl("/login?session=expired")
-                                                .maximumSessions(1)
-                                                .expiredUrl("/login?session=expired"))
-                                .exceptionHandling()
-                                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                                        response.sendRedirect(request.getContextPath() + "/access-denied");
-                                })
-                                .and()
-                                .httpBasic(); // Basic authentication
-                return http.build();
-        }
-
+       @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                                 .csrf(AbstractHttpConfigurer::disable)
+                                 .httpBasic(AbstractHttpConfigurer::disable)
+                                 .requiresChannel(ch -> ch.anyRequest().requiresSecure())
+                                 .authorizeHttpRequests(auth -> auth
+                                             .requestMatchers("/nib/api/nia/*").authenticated()
+                                             .anyRequest().authenticated())
+                                 .formLogin(formLogin -> formLogin
+                                             .loginPage("/login")
+                                             .permitAll()
+                                             .successHandler(authenticationSuccessHandler))
+                                 .logout(logout -> logout
+                                             .logoutUrl("/logout")
+                                             .logoutSuccessUrl("/login?logout")
+                                             .invalidateHttpSession(true)
+                                             .deleteCookies("JSESSIONID")
+                                             .permitAll())
+                                 .sessionManagement(sessionManagement -> sessionManagement
+                                             .invalidSessionUrl("/login?session=expired")
+                                             .maximumSessions(1)
+                                             .expiredUrl("/login?session=expired"))
+                                 .exceptionHandling()
+                                 .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                     response.sendRedirect(request.getContextPath() + "/access-denied");
+                                 });
+                                 // REMOVED: .and().httpBasic(); (This was triggering the browser popup)
+                                 
+            return http.build();
+    }
        
         //  @Bean
         // public AuthenticationManager authManager() {
