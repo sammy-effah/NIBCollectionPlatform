@@ -59,33 +59,55 @@ public class SecurityConfig {
         }
 
        
-         @Bean
-        public AuthenticationManager authManager() {
-                return new ProviderManager(List.of(new CustomLdapAuthProvider()));
-        }
+        //  @Bean
+        // public AuthenticationManager authManager() {
+        //         return new ProviderManager(List.of(new CustomLdapAuthProvider()));
+        // }
 
-        // ========= LDAP Context Source =========
-        @Bean
-        public LdapContextSource contextSource() {
-                LdapContextSource contextSource = new LdapContextSource();
-                contextSource.setUrl("ldap://NIBWS22ADC:389");
-                contextSource.setBase("dc=nib,dc=com,dc=gh");
-                contextSource.setReferral("ignore");
-                contextSource.afterPropertiesSet();
-                return contextSource;
-        }
+        // // ========= LDAP Context Source =========
+        // @Bean
+        // public LdapContextSource contextSource() {
+        //         LdapContextSource contextSource = new LdapContextSource();
+        //         contextSource.setUrl("ldap://NIBWS22ADC:389");
+        //         contextSource.setBase("dc=nib,dc=com,dc=gh");
+        //         contextSource.setReferral("ignore");
+        //         contextSource.afterPropertiesSet();
+        //         return contextSource;
+        // }
+
+        // @Bean
+        // public LdapTemplate ldapTemplate(LdapContextSource contextSource) {
+        //         return new LdapTemplate(contextSource);
+        // }
 
         @Bean
-        public LdapTemplate ldapTemplate(LdapContextSource contextSource) {
-                return new LdapTemplate(contextSource);
-        }
+    public AuthenticationManager authManager(
+            CustomUserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+        
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        
+        return new ProviderManager(List.of(authProvider));
+    }
+
+    // ========= PasswordEncoder =========
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        // Use BCrypt if your database passwords are hashed ($2a$10$...)
+        return new BCryptPasswordEncoder();
+        
+        // ONLY use NoOpPasswordEncoder temporarily if your database stores plain-text passwords:
+        // return NoOpPasswordEncoder.getInstance();
+    }
 
         // ========= PasswordEncoder =========
-        @Bean
-        @SuppressWarnings("deprecation")
-        public PasswordEncoder passwordEncoder() {
-                return NoOpPasswordEncoder.getInstance();
-        }
+        // @Bean
+        // @SuppressWarnings("deprecation")
+        // public PasswordEncoder passwordEncoder() {
+        //         return NoOpPasswordEncoder.getInstance();
+        // }
 
 
         // @Bean
